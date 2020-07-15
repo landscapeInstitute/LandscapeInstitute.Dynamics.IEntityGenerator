@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.30204.135
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LandscapeInstitute.Dynamics.IEntityGenerator", "LandscapeInstitute.Dynamics.IEntityGenerator.csproj", "{BBD216C8-EAD6-46B9-8AD8-E30E1BDDD470}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{BBD216C8-EAD6-46B9-8AD8-E30E1BDDD470}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BBD216C8-EAD6-46B9-8AD8-E30E1BDDD470}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BBD216C8-EAD6-46B9-8AD8-E30E1BDDD470}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BBD216C8-EAD6-46B9-8AD8-E30E1BDDD470}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {A403057C-C68A-462D-BEF1-7F345DD3742B}
+	EndGlobalSection
+EndGlobal
