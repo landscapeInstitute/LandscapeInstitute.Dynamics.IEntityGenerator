@@ -5,8 +5,34 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:LandscapeInstitute.Dynamics.IEntityGenerator"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
+        Title="Dynamics IEntity Generator" Height="650" Width="1035">
     <Grid>
-        
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition/>
+            <ColumnDefinition Width="1200"/>
+        </Grid.ColumnDefinitions>
+        <ListBox x:Name="listBoxZone" ItemsSource="{Binding CheckBoxList}" Background="Azure" Width="500" Margin="10,10,690,93" Grid.ColumnSpan="2">
+            <ListBox.ItemTemplate>
+                <DataTemplate>
+                    <CheckBox x:Name="CheckBoxZone" IsChecked="{Binding Checked}"  Content="{Binding Text}" Checked="CheckBox_Checked" Unchecked="CheckBox_UnChecked"   />
+                </DataTemplate>
+            </ListBox.ItemTemplate>
+        </ListBox>
+        <TextBox x:Name="Url" Grid.ColumnSpan="2" HorizontalAlignment="Left" Height="23" Margin="542,52,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="342" TextChanged="SaveConfig_TextChanged"/>
+        <TextBox x:Name="Username" Grid.ColumnSpan="2" HorizontalAlignment="Left" Height="23" Margin="542,127,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="342" TextChanged="SaveConfig_TextChanged"/>
+        <TextBox x:Name="Password" Grid.ColumnSpan="2" HorizontalAlignment="Left" Height="22" Margin="542,208,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="342" TextChanged="SaveConfig_TextChanged"/>
+        <Label Grid.ColumnSpan="2" Content="Dynamics URL" HorizontalAlignment="Left" Margin="537,21,0,0" VerticalAlignment="Top" RenderTransformOrigin="-0.506,0.254" Width="202"/>
+        <Label Grid.ColumnSpan="2" Content="Username" HorizontalAlignment="Left" Margin="537,96,0,0" VerticalAlignment="Top" RenderTransformOrigin="-0.506,0.254" Width="202"/>
+        <Label Grid.ColumnSpan="2" Content="Password" HorizontalAlignment="Left" Margin="537,177,0,0" VerticalAlignment="Top" RenderTransformOrigin="-0.506,0.254" Width="202"/>
+        <Button x:Name="Generate_Button" Grid.ColumnSpan="2" Content="Generate C#" HorizontalAlignment="Left" Height="44" Margin="679,482,0,0" VerticalAlignment="Top" Width="126" Click="Generate_Button_Click"/>
+        <TextBox x:Name="OutputDir" Grid.ColumnSpan="2" HorizontalAlignment="Left" Height="22" Margin="542,288,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="342" TextChanged="SaveConfig_TextChanged"/>
+        <Label Grid.ColumnSpan="2" Content="Output Directory" HorizontalAlignment="Left" Margin="537,257,0,0" VerticalAlignment="Top" RenderTransformOrigin="-0.506,0.254" Width="202"/>
+        <Button x:Name="SaveConfig_Button" Grid.ColumnSpan="2" Content="Save" HorizontalAlignment="Left" Height="44" Margin="821,482,0,0" VerticalAlignment="Top" Width="126" Click="SaveConfig_Button_Click"/>
+        <Button x:Name="BrowseOutput_Button" Grid.ColumnSpan="2" Content="Browse" HorizontalAlignment="Left" Height="22" Margin="884,288,0,0" VerticalAlignment="Top" Width="91" Click="BrowseOutput_Button_Click" FontSize="10"/>
+        <TextBox x:Name="Namespace" Grid.ColumnSpan="2" HorizontalAlignment="Left" Height="22" Margin="542,429,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="342" TextChanged="SaveConfig_TextChanged"/>
+        <Label Grid.ColumnSpan="2" Content="Namespace" HorizontalAlignment="Left" Margin="537,398,0,0" VerticalAlignment="Top" RenderTransformOrigin="-0.506,0.254" Width="202"/>
+        <Button x:Name="GetEntities_Button" Grid.ColumnSpan="2" Content="Download Entities" HorizontalAlignment="Left" Height="44" Margin="537,482,0,0" VerticalAlignment="Top" Width="126" Click="GetEntities_Button_Click"/>
+        <ProgressBar x:Name="ProgressBar" Grid.ColumnSpan="2" HorizontalAlignment="Left" Height="23" Margin="10,572,0,0" VerticalAlignment="Top" Width="1002"/>
+        <Label x:Name="Status" Grid.ColumnSpan="2" Content="Ready" HorizontalAlignment="Left" Margin="10,541,0,0" VerticalAlignment="Top" Width="1002" Background="{x:Null}"/>
     </Grid>
 </Window>
