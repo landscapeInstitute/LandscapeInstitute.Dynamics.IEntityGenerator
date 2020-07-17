@@ -113,6 +113,7 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="EntityCheckBox.cs" />
     <Compile Include="EntityToolset.cs" />
     <Compile Include="Config.cs" />
     <Compile Include="MainWindow.xaml.cs">

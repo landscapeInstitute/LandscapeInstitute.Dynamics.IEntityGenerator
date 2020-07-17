@@ -23,15 +23,11 @@ namespace LandscapeInstitute.Dynamics.IEntityGenerator
     {
 
         private IOrganizationService _organizationService;
-
         private string _appPath = Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
         private string _configFile = Path.Combine(Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location), "config.json");
-
-        private Boolean _configSaveRequred = false;
-
         private Config _config = new Config();
 
-        public ObservableCollection<CheckBoxClass> CheckBoxList { get; set; }
+        #region Methods
 
         public MainWindow()
         {
@@ -86,6 +82,8 @@ namespace LandscapeInstitute.Dynamics.IEntityGenerator
 
             SaveConfig();
 
+            MenuItem root = new MenuItem() { Value = "Entities" };
+
             if (_organizationService == null) return;
 
             try
@@ -100,14 +98,12 @@ namespace LandscapeInstitute.Dynamics.IEntityGenerator
 
                 RetrieveAllEntitiesRequest retrieveEntityRequest = new RetrieveAllEntitiesRequest
                 {
-                    EntityFilters = EntityFilters.Default,
+                    EntityFilters = EntityFilters.Attributes,
                     RetrieveAsIfPublished = true
                 };
 
                 RetrieveAllEntitiesResponse retrieveAllEntitiesResponse = (RetrieveAllEntitiesResponse)_organizationService.Execute(retrieveEntityRequest);
                 var entities = retrieveAllEntitiesResponse.EntityMetadata.OrderBy(x => x.LogicalName);
-
-                CheckBoxList = new ObservableCollection<CheckBoxClass>();
 
                 this.Dispatcher.Invoke(() =>
                 {
@@ -125,22 +121,38 @@ namespace LandscapeInstitute.Dynamics.IEntityGenerator
                         ProgressBar.Value = ProgressBar.Value + 1;
                     });
 
-                 
-                        CheckBoxList.Add(new CheckBoxClass
+
+                    MenuItem entityMenuItem = new MenuItem() {
+                        Value = entity.LogicalName,
+                        Checked = _config.HasEntity(entity.LogicalName),
+                        ParentEntity = null
+                    };
+
+                    foreach (AttributeMetadata field in entity.Attributes.OrderBy(x => x.LogicalName))
+                    {
+                        if (!string.IsNullOrWhiteSpace(field.LogicalName))
                         {
-                            Text = entity.LogicalName,
-                            Checked = _config.Entities.Contains(entity.LogicalName) ? true : false
-                        });
-                  
+                            MenuItem fieldMenuItem = new MenuItem() {
+                                Value = field.LogicalName,
+                                Checked = _config.HasEntityField(entity.LogicalName, field.LogicalName),
+                                ParentEntity = entity.LogicalName
+                            };
+                            entityMenuItem.Items.Add(fieldMenuItem);
+                        }
+
+                    }
+
+                    root.Items.Add(entityMenuItem);
 
                 }
 
                 this.Dispatcher.Invoke(() =>
                 {
-                    this.DataContext = this;
+                    TreeView.Items.Clear();
+                    TreeView.Items.Add(root);
                 });
 
- 
+
                 this.Dispatcher.Invoke(() =>
                 {
                     GetEntities_Button.IsEnabled = true;
@@ -189,7 +201,7 @@ namespace LandscapeInstitute.Dynamics.IEntityGenerator
                 }
             }
 
-            
+
 
         }
 
@@ -220,11 +232,11 @@ namespace LandscapeInstitute.Dynamics.IEntityGenerator
                     ProgressBar.Maximum = _config.Entities.Count();
                 });
 
-                foreach (string entity in _config.Entities)
+                foreach (Entity entity in _config.Entities)
                 {
 
 
-                    WriteToEntityFile(entity, @"
+                    WriteToEntityFile(entity.LogicalName, @"
 
                     using Felinesoft.Framework.Core;
                     using Felinesoft.Framework.CoreInterfaces;
@@ -233,8 +245,8 @@ namespace LandscapeInstitute.Dynamics.IEntityGenerator
 
                     namespace " + _config.Namespace + @"
                     {
-                        [EntityName(""" + entity + @""")]
-                        public class " + entity + @" : IEntity
+                        [EntityName(""" + entity.LogicalName + @""")]
+                        public class " + entity.LogicalName + @" : IEntity
                         {
                     ");
 
@@ -243,23 +255,23 @@ namespace LandscapeInstitute.Dynamics.IEntityGenerator
                         ProgressBar.Value = ProgressBar.Value + 1;
                     });
 
-                    SetStatus($"Requesting Entities Details for {entity}...");
+                    SetStatus($"Requesting Entities Details for {entity.LogicalName}...");
 
                     RetrieveEntityRequest retrieveEntityRequest = new RetrieveEntityRequest
                     {
-                        LogicalName = entity,
+                        LogicalName = entity.LogicalName,
                         EntityFilters = EntityFilters.All,
                     };
 
                     RetrieveEntityResponse retrieveEntityResponse = (RetrieveEntityResponse)_organizationService.Execute(retrieveEntityRequest);
 
-     
+
                     foreach (AttributeMetadata field in retrieveEntityResponse.EntityMetadata.Attributes)
                     {
 
                         if (EntityToolset.IgnoreAttributeType(field.AttributeType.ToString()) == false)
                         {
-                            WriteToEntityFile(entity, @"
+                            WriteToEntityFile(entity.LogicalName, @"
                             [FieldName(""" + field.LogicalName + @""")]
                             public " + EntityToolset.ConvertAttributeType(field.AttributeType.ToString()) + @" " + EntityToolset.ConvertLogicalNameToDisplayName(field.EntityLogicalName, field.LogicalName) + @" { get; set; }
                             ");
@@ -268,7 +280,7 @@ namespace LandscapeInstitute.Dynamics.IEntityGenerator
                     }
 
 
-                    WriteToEntityFile(entity, @"
+                    WriteToEntityFile(entity.LogicalName, @"
                         }
                     }");
 
@@ -295,29 +307,6 @@ namespace LandscapeInstitute.Dynamics.IEntityGenerator
 
         }
 
-        public class CheckBoxClass
-        {
-            public string Text { get; set; }
-
-            public Boolean Checked { get; set; }
-        }
-
-        private void CheckBox_Checked(object sender, RoutedEventArgs e)
-        {
-            CheckBox checkbox = (CheckBox)sender;
-            _config.Entities.Add(checkbox.Content.ToString());
-            SaveConfig();
-
-        }
-
-        private void CheckBox_UnChecked(object sender, RoutedEventArgs e)
-        {
-            CheckBox checkbox = (CheckBox)sender;
-            _config.Entities.Remove(checkbox.Content.ToString());
-            SaveConfig();
-
-        }
-     
         public void SaveConfig()
         {
             this.Dispatcher.Invoke(() =>
@@ -348,17 +337,16 @@ namespace LandscapeInstitute.Dynamics.IEntityGenerator
                 }
             }
 
-            
-                Username.Text = _config.Username;
-                Password.Text = _config.Password;
-                Url.Text = _config.Url;
-                OutputDir.Text = _config.OutputDirectory;
-                Namespace.Text = _config.Namespace;
-           
+
+            Username.Text = _config.Username;
+            Password.Text = _config.Password;
+            Url.Text = _config.Url;
+            OutputDir.Text = _config.OutputDirectory;
+            Namespace.Text = _config.Namespace;
+
 
 
         }
-
         public void SetStatus(string statusText)
         {
 
@@ -366,6 +354,70 @@ namespace LandscapeInstitute.Dynamics.IEntityGenerator
             {
                 Status.Content = statusText;
             });
+
+        }
+
+        #endregion
+
+        #region Classes
+
+        public class MenuItem
+        {
+            public MenuItem()
+            {
+                this.Items = new ObservableCollection<MenuItem>();
+            }
+
+            public string Value { get; set; }
+
+            public Boolean Checked { get; set; }
+
+            public String ParentEntity { get; set; }
+
+            public ObservableCollection<MenuItem> Items { get; set; }
+        }
+
+        #endregion
+
+        #region Events
+
+        private void CheckBox_Checked(object sender, RoutedEventArgs e)
+        {
+            EntityCheckBox checkbox = (EntityCheckBox)sender;
+
+            if (string.IsNullOrWhiteSpace(checkbox.ParentEntity))
+            {
+
+                _config.AddEntity(checkbox.Content.ToString());
+
+            }
+            else
+            {
+
+                _config.AddEntityField(checkbox.ParentEntity, checkbox.Content.ToString());
+            }
+
+            SaveConfig();
+
+        }
+
+        private void CheckBox_UnChecked(object sender, RoutedEventArgs e)
+        {
+            EntityCheckBox checkbox = (EntityCheckBox)sender;
+
+            if (string.IsNullOrWhiteSpace(checkbox.ParentEntity))
+            {
+
+                _config.RemoveEntity(checkbox.Content.ToString());
+
+            }
+            else
+            {
+
+                _config.RemoveEntityField(checkbox.ParentEntity, checkbox.Content.ToString());
+            }
+
+            SaveConfig();
 
         }
 
@@ -384,7 +436,7 @@ namespace LandscapeInstitute.Dynamics.IEntityGenerator
 
         private void SaveConfig_TextChanged(object sender, TextChangedEventArgs e)
         {
-            _configSaveRequred = true;
+            
         }
 
         private void GetEntities_Button_Click(object sender, RoutedEventArgs e)
@@ -397,6 +449,7 @@ namespace LandscapeInstitute.Dynamics.IEntityGenerator
             new Thread(CreateCSharpCode).Start();
         }
 
+        #endregion
 
 
     }

@@ -11,13 +11,18 @@
             <ColumnDefinition/>
             <ColumnDefinition Width="1200"/>
         </Grid.ColumnDefinitions>
-        <ListBox x:Name="listBoxZone" ItemsSource="{Binding CheckBoxList}" Background="Azure" Width="500" Margin="10,10,690,93" Grid.ColumnSpan="2">
-            <ListBox.ItemTemplate>
-                <DataTemplate>
-                    <CheckBox x:Name="CheckBoxZone" IsChecked="{Binding Checked}"  Content="{Binding Text}" Checked="CheckBox_Checked" Unchecked="CheckBox_UnChecked"   />
-                </DataTemplate>
-            </ListBox.ItemTemplate>
-        </ListBox>
+
+        <TreeView x:Name="TreeView" Grid.ColumnSpan="2" ItemsSource="{Binding CheckBoxList}" HorizontalAlignment="Left" Height="519" Margin="10,7,0,0" VerticalAlignment="Top" Width="501" 
+                  VirtualizingStackPanel.IsVirtualizing="True"
+                  VirtualizingStackPanel.VirtualizationMode="Recycling">
+            <TreeView.ItemTemplate>
+                <HierarchicalDataTemplate DataType="{x:Type MenuItem}" ItemsSource="{Binding Items}">
+                    <StackPanel Orientation="Horizontal">
+                        <local:EntityCheckBox IsChecked="{Binding Checked}" Content="{Binding Value}" ParentEntity="{Binding ParentEntity}" Checked="CheckBox_Checked" Unchecked="CheckBox_UnChecked"/>
+                    </StackPanel>
+                </HierarchicalDataTemplate>
+            </TreeView.ItemTemplate>
+        </TreeView>
         <TextBox x:Name="Url" Grid.ColumnSpan="2" HorizontalAlignment="Left" Height="23" Margin="542,52,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="342" TextChanged="SaveConfig_TextChanged"/>
         <TextBox x:Name="Username" Grid.ColumnSpan="2" HorizontalAlignment="Left" Height="23" Margin="542,127,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="342" TextChanged="SaveConfig_TextChanged"/>
         <TextBox x:Name="Password" Grid.ColumnSpan="2" HorizontalAlignment="Left" Height="22" Margin="542,208,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="342" TextChanged="SaveConfig_TextChanged"/>
@@ -34,5 +39,6 @@
         <Button x:Name="GetEntities_Button" Grid.ColumnSpan="2" Content="Download Entities" HorizontalAlignment="Left" Height="44" Margin="537,482,0,0" VerticalAlignment="Top" Width="126" Click="GetEntities_Button_Click"/>
         <ProgressBar x:Name="ProgressBar" Grid.ColumnSpan="2" HorizontalAlignment="Left" Height="23" Margin="10,572,0,0" VerticalAlignment="Top" Width="1002"/>
         <Label x:Name="Status" Grid.ColumnSpan="2" Content="Ready" HorizontalAlignment="Left" Margin="10,541,0,0" VerticalAlignment="Top" Width="1002" Background="{x:Null}"/>
+
     </Grid>
 </Window>
