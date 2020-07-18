@@ -1,4 +1,5 @@
-﻿using Microsoft.Xrm.Sdk;
+﻿using Microsoft.Crm.Sdk.Messages;
+using Microsoft.Xrm.Sdk;
 using Microsoft.Xrm.Sdk.Messages;
 using Microsoft.Xrm.Sdk.Metadata;
 using Microsoft.Xrm.Tooling.Connector;
@@ -37,23 +38,12 @@ namespace LandscapeInstitute.Dynamics.IEntityGenerator
             LoadConfig();
             ClearOutputDirectory();
 
-            _organizationService = GetOrganiszationService();
-
             SetStatus("Ready...");
 
         }
 
         public IOrganizationService GetOrganiszationService()
         {
-
-            if (Username.Text == string.Empty)
-                Username.Background = System.Windows.Media.Brushes.LightSalmon;
-
-            if (Password.Text == string.Empty)
-                Password.Background = System.Windows.Media.Brushes.LightSalmon;
-
-            if (Url.Text == string.Empty)
-                Url.Background = System.Windows.Media.Brushes.LightSalmon;
 
             if (Username.Text == string.Empty || Password.Text == string.Empty || Url.Text == string.Empty)
             {
@@ -67,14 +57,30 @@ namespace LandscapeInstitute.Dynamics.IEntityGenerator
                 Url.Background = System.Windows.Media.Brushes.White;
             }
 
-            SetStatus("Connecting to Dynamics...");
-            var connectionString = $"AuthType = Office365; Url = {Url.Text}; Username = {Username.Text}; Password = {Password.Text}";
-            CrmServiceClient conn = new CrmServiceClient(connectionString);
+            
 
-            IOrganizationService service;
-            service = (IOrganizationService)conn.OrganizationWebProxyClient != null ? (IOrganizationService)conn.OrganizationWebProxyClient : (IOrganizationService)conn.OrganizationServiceProxy;
+            try
+            {
+                SetStatus("Connecting...");
 
-            return service;
+                var connectionString = $"AuthType = Office365; Url = {Url.Text}; Username = {Username.Text}; Password = {Password.Text}";
+                CrmServiceClient conn = new CrmServiceClient(connectionString);
+
+                IOrganizationService service;
+                service = (IOrganizationService)conn.OrganizationWebProxyClient != null ? (IOrganizationService)conn.OrganizationWebProxyClient : (IOrganizationService)conn.OrganizationServiceProxy;
+
+                return service;
+            }
+
+            catch(Exception ex)
+            {
+
+                MessageBox.Show($"{ex.Message}", "Unable to Connect", MessageBoxButton.OK, MessageBoxImage.Error);
+
+                return null;
+
+            }
+
 
         }
 
@@ -83,9 +89,17 @@ namespace LandscapeInstitute.Dynamics.IEntityGenerator
 
             SaveConfig();
 
-            MenuItem root = new MenuItem() { Value = "Entities", Enabled = false, IsExpanded = true };
+            SetStatus("Connecting...");
+
+
+            this.Dispatcher.Invoke(() =>
+            {
+                _organizationService = GetOrganiszationService();
+            });
 
             if (_organizationService == null) return;
+
+            MenuItem root = new MenuItem() { Value = "Entities", Enabled = false, IsExpanded = true };
 
             try
             {
@@ -483,11 +497,6 @@ namespace LandscapeInstitute.Dynamics.IEntityGenerator
 
         }
 
-        private void SaveConfig_TextChanged(object sender, TextChangedEventArgs e)
-        {
-            
-        }
-
         private void GetEntities_Button_Click(object sender, RoutedEventArgs e)
         {
             new Thread(LoadEntities).Start();
@@ -498,7 +507,24 @@ namespace LandscapeInstitute.Dynamics.IEntityGenerator
             new Thread(CreateCSharpCode).Start();
         }
 
+
         #endregion
+
+        private void Validate_TextChanged(object sender, TextChangedEventArgs e)
+        {
+
+            var textbox = (TextBox)sender;
+
+            if (!string.IsNullOrWhiteSpace(textbox.Text))
+            {
+                textbox.BorderBrush = System.Windows.Media.Brushes.DarkSlateBlue;
+            }
+            else
+            {
+                textbox.BorderBrush = System.Windows.Media.Brushes.Red;
+            }
+
+        }
 
 
     }
