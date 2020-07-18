@@ -11,7 +11,7 @@ namespace LandscapeInstitute.Dynamics.IEntityGenerator
     public class EntityCheckBox : CheckBox
     {
         public static readonly DependencyProperty ParentEntityProperty =
-              DependencyProperty.Register("ParentEntity", typeof(string), typeof(CheckBox));
+              DependencyProperty.Register("ParentEntity", typeof(string), typeof(EntityCheckBox));
 
         public string ParentEntity
         {

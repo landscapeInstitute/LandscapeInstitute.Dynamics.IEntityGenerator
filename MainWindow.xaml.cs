@@ -5,6 +5,7 @@ using Microsoft.Xrm.Tooling.Connector;
 using Newtonsoft.Json;
 using Ookii.Dialogs.Wpf;
 using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Drawing;
 using System.IO;
@@ -12,7 +13,7 @@ using System.Linq;
 using System.Threading;
 using System.Windows;
 using System.Windows.Controls;
-
+using System.Windows.Media;
 
 namespace LandscapeInstitute.Dynamics.IEntityGenerator
 {
@@ -82,7 +83,7 @@ namespace LandscapeInstitute.Dynamics.IEntityGenerator
 
             SaveConfig();
 
-            MenuItem root = new MenuItem() { Value = "Entities" };
+            MenuItem root = new MenuItem() { Value = "Entities", Enabled = false, IsExpanded = true };
 
             if (_organizationService == null) return;
 
@@ -125,7 +126,9 @@ namespace LandscapeInstitute.Dynamics.IEntityGenerator
                     MenuItem entityMenuItem = new MenuItem() {
                         Value = entity.LogicalName,
                         Checked = _config.HasEntity(entity.LogicalName),
-                        ParentEntity = null
+                        ParentEntity = null,
+                        Tag = $"{entity.LogicalName}",
+                        Enabled = true
                     };
 
                     foreach (AttributeMetadata field in entity.Attributes.OrderBy(x => x.LogicalName))
@@ -135,7 +138,9 @@ namespace LandscapeInstitute.Dynamics.IEntityGenerator
                             MenuItem fieldMenuItem = new MenuItem() {
                                 Value = field.LogicalName,
                                 Checked = _config.HasEntityField(entity.LogicalName, field.LogicalName),
-                                ParentEntity = entity.LogicalName
+                                ParentEntity = entity.LogicalName,
+                                Tag = $"{entity.LogicalName}_{field.LogicalName}",
+                                Enabled = true
                             };
                             entityMenuItem.Items.Add(fieldMenuItem);
                         }
@@ -176,6 +181,26 @@ namespace LandscapeInstitute.Dynamics.IEntityGenerator
             }
 
 
+        }
+
+        public static IEnumerable<T> FindVisualChildren<T>(DependencyObject depObj) where T : DependencyObject
+        {
+            if (depObj != null)
+            {
+                for (int i = 0; i < VisualTreeHelper.GetChildrenCount(depObj); i++)
+                {
+                    DependencyObject child = VisualTreeHelper.GetChild(depObj, i);
+                    if (child != null && child is T)
+                    {
+                        yield return (T)child;
+                    }
+
+                    foreach (T childOfChild in FindVisualChildren<T>(child))
+                    {
+                        yield return childOfChild;
+                    }
+                }
+            }
         }
 
         public void WriteToEntityFile(string logicalName, string content)
@@ -374,6 +399,12 @@ namespace LandscapeInstitute.Dynamics.IEntityGenerator
 
             public String ParentEntity { get; set; }
 
+            public String Tag { get; set; }
+
+            public Boolean Enabled { get; set; }
+
+            public Boolean IsExpanded { get; set; }
+
             public ObservableCollection<MenuItem> Items { get; set; }
         }
 
@@ -388,11 +419,18 @@ namespace LandscapeInstitute.Dynamics.IEntityGenerator
             if (string.IsNullOrWhiteSpace(checkbox.ParentEntity))
             {
 
-                _config.AddEntity(checkbox.Content.ToString());
+                if (checkbox.IsMouseOver)
+                {
+                    FindVisualChildren<EntityCheckBox>(this).Where(x => x.ParentEntity == checkbox.Content && x.IsChecked == false).ToList().ForEach(x => x.IsChecked = true);
+                }
 
+                _config.AddEntity(checkbox.Content.ToString());
             }
             else
             {
+
+                var parentCheckbox = FindVisualChildren<EntityCheckBox>(this).Where(x => x.Content == checkbox.ParentEntity).FirstOrDefault();
+                parentCheckbox.IsChecked = true;
 
                 _config.AddEntityField(checkbox.ParentEntity, checkbox.Content.ToString());
             }
@@ -408,11 +446,22 @@ namespace LandscapeInstitute.Dynamics.IEntityGenerator
             if (string.IsNullOrWhiteSpace(checkbox.ParentEntity))
             {
 
+                FindVisualChildren<EntityCheckBox>(this).Where(x => x.ParentEntity == checkbox.Content && x.IsChecked == true).ToList().ForEach(x => x.IsChecked = false);
+
                 _config.RemoveEntity(checkbox.Content.ToString());
 
             }
             else
             {
+
+                var checkedFields = FindVisualChildren<EntityCheckBox>(this).Where(x => x.ParentEntity == checkbox.ParentEntity && x.IsChecked == true).Count();
+
+                if (checkedFields == 0)
+                {
+                    var parentCheckbox = FindVisualChildren<EntityCheckBox>(this).Where(x => x.Content == checkbox.ParentEntity).FirstOrDefault();
+                    parentCheckbox.IsChecked = false;
+
+                }
 
                 _config.RemoveEntityField(checkbox.ParentEntity, checkbox.Content.ToString());
             }

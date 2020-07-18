@@ -18,11 +18,18 @@
             <TreeView.ItemTemplate>
                 <HierarchicalDataTemplate DataType="{x:Type MenuItem}" ItemsSource="{Binding Items}">
                     <StackPanel Orientation="Horizontal">
-                        <local:EntityCheckBox IsChecked="{Binding Checked}" Content="{Binding Value}" ParentEntity="{Binding ParentEntity}" Checked="CheckBox_Checked" Unchecked="CheckBox_UnChecked"/>
+                        <local:EntityCheckBox IsEnabled="{Binding Enabled}" IsChecked="{Binding Checked}" Content="{Binding Value}" Tag="{Binding Tag}" ParentEntity="{Binding ParentEntity}" Checked="CheckBox_Checked" Unchecked="CheckBox_UnChecked"/>
                     </StackPanel>
                 </HierarchicalDataTemplate>
             </TreeView.ItemTemplate>
+            <TreeView.ItemContainerStyle>
+                <Style TargetType="{x:Type TreeViewItem}">
+                    <Setter Property="IsExpanded" Value="{Binding IsExpanded}">
+                    </Setter>
+                </Style>
+            </TreeView.ItemContainerStyle>
         </TreeView>
+        
         <TextBox x:Name="Url" Grid.ColumnSpan="2" HorizontalAlignment="Left" Height="23" Margin="542,52,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="342" TextChanged="SaveConfig_TextChanged"/>
         <TextBox x:Name="Username" Grid.ColumnSpan="2" HorizontalAlignment="Left" Height="23" Margin="542,127,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="342" TextChanged="SaveConfig_TextChanged"/>
         <TextBox x:Name="Password" Grid.ColumnSpan="2" HorizontalAlignment="Left" Height="22" Margin="542,208,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="342" TextChanged="SaveConfig_TextChanged"/>
