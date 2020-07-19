@@ -13,7 +13,7 @@
         </Grid.ColumnDefinitions>
 
         <TreeView x:Name="TreeView" Grid.ColumnSpan="2" ItemsSource="{Binding CheckBoxList}" HorizontalAlignment="Left" Height="519" Margin="20,7,0,0" VerticalAlignment="Top" Width="491" 
-                  VirtualizingStackPanel.IsVirtualizing="True"
+                  VirtualizingStackPanel.IsVirtualizing="False"
                   VirtualizingStackPanel.VirtualizationMode="Recycling">
             <TreeView.ItemTemplate>
                 <HierarchicalDataTemplate DataType="{x:Type MenuItem}" ItemsSource="{Binding Items}">
