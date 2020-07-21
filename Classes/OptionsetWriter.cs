@@ -18,7 +18,6 @@ namespace LandscapeInstitute.Dynamics.IEntityGenerator.Classes
         public string OutputFile;
 
         private string Options;
-
         private string Body;
 
         public OptionsetWriter(string entityLogicalName, string optionsetName, string outputDirectory, string classNamespace)
