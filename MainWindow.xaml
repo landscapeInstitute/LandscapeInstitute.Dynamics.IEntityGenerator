@@ -41,8 +41,8 @@
         <Label Grid.ColumnSpan="2" Content="Output Directory *" HorizontalAlignment="Left" Margin="537,257,0,0" VerticalAlignment="Top" RenderTransformOrigin="-0.506,0.254" Width="202"/>
         <Button x:Name="SaveConfig_Button" Grid.ColumnSpan="2" Content="Save" HorizontalAlignment="Left" Height="44" Margin="839,482,0,0" VerticalAlignment="Top" Width="136" Click="SaveConfig_Button_Click" Background="#FFE0E0E0"/>
         <Button x:Name="BrowseOutput_Button" Grid.ColumnSpan="2" Content="Browse" HorizontalAlignment="Left" Height="22" Margin="887,288,0,0" VerticalAlignment="Top" Width="91" Click="BrowseOutput_Button_Click" FontSize="10" Background="#FFE0E0E0" RenderTransformOrigin="0.912,0.545"/>
-        <TextBox x:Name="Namespace" Grid.ColumnSpan="2" HorizontalAlignment="Left" Height="22" Margin="542,429,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="342" TextChanged="Validate_TextChanged" BorderBrush="#FFB61111"/>
-        <Label Grid.ColumnSpan="2" Content="Namespace *" HorizontalAlignment="Left" Margin="537,398,0,0" VerticalAlignment="Top" RenderTransformOrigin="-0.506,0.254" Width="202"/>
+        <TextBox x:Name="EntityNamespace" Grid.ColumnSpan="2" HorizontalAlignment="Left" Height="22" Margin="542,429,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="342" TextChanged="Validate_TextChanged" BorderBrush="#FFB61111"/>
+        <Label Grid.ColumnSpan="2" Content="Entity Namespace *" HorizontalAlignment="Left" Margin="537,398,0,0" VerticalAlignment="Top" RenderTransformOrigin="-0.506,0.254" Width="202"/>
         <Button x:Name="GetEntities_Button" Grid.ColumnSpan="2" Content="Download Entities" HorizontalAlignment="Left" Height="44" Margin="542,482,0,0" VerticalAlignment="Top" Width="136" Click="GetEntities_Button_Click" Background="#FFE0E0E0"/>
         <ProgressBar x:Name="ProgressBar" Grid.ColumnSpan="2" HorizontalAlignment="Left" Height="23" Margin="20,572,0,0" VerticalAlignment="Top" Width="978" Background="#FFF1F1F1">
             <ProgressBar.Foreground>
@@ -53,6 +53,8 @@
             </ProgressBar.Foreground>
         </ProgressBar>
         <Label x:Name="Status" Grid.ColumnSpan="2" Content="Ready" HorizontalAlignment="Left" Margin="20,541,0,0" VerticalAlignment="Top" Width="978" Background="{x:Null}"/>
+        <TextBox x:Name="OptionsetNamespace" Grid.ColumnSpan="2" HorizontalAlignment="Left" Height="22" Margin="542,361,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="342" TextChanged="Validate_TextChanged" BorderBrush="#FFB61111"/>
+        <Label Grid.ColumnSpan="2" Content="Optionset Namespace" HorizontalAlignment="Left" Margin="537,330,0,0" VerticalAlignment="Top" RenderTransformOrigin="-0.506,0.254" Width="202"/>
 
     </Grid>
 </Window>
