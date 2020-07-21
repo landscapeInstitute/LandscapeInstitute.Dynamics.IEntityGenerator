@@ -20,6 +20,8 @@ namespace LandscapeInstitute.Dynamics.IEntityGenerator.Classes
         private string Options;
         private string Body;
 
+        public string DataType;
+
         public OptionsetWriter(string entityLogicalName, string optionsetName, string outputDirectory, string classNamespace)
         {
             EntityLogicalName = entityLogicalName;
@@ -27,6 +29,8 @@ namespace LandscapeInstitute.Dynamics.IEntityGenerator.Classes
             NameSpace = classNamespace;
             OutputDirectory = Path.Combine(outputDirectory, "Optionsets");
             OutputFile = Path.Combine(OutputDirectory, $"{optionsetName}.cs");
+
+            DataType = $"{EntityLogicalName}_{OptionsetName}";
 
             Directory.CreateDirectory(OutputDirectory);
 

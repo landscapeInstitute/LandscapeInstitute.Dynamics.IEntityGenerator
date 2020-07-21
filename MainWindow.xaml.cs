@@ -303,27 +303,27 @@ namespace LandscapeInstitute.Dynamics.IEntityGenerator
                         {
 
                             var pickList = field as PicklistAttributeMetadata;
+                            var dataType = field.AttributeType.ToString();
 
 
                             if (pickList != null)
                             {
 
-                                OptionsetWriter optionsetWriter = new OptionsetWriter()
+                                OptionsetWriter optionsetWriter = new OptionsetWriter(entity.LogicalName, pickList.OptionSet.DisplayName.LocalizedLabels.FirstOrDefault().Label, _config.OutputDirectory, _config.OptionsetNamespace);
 
                                 foreach (OptionMetadata option in pickList.OptionSet.Options)
                                 {
-                                    optionset.Add(option.Value ?? default(int), option.Label.LocalizedLabels.FirstOrDefault().Label);
+                                    optionsetWriter.AddOption(option.Value ?? default(int), option.Label.LocalizedLabels.FirstOrDefault().Label);
                                 }
 
-                                optionset.LogicalName = pickList.OptionSet.DisplayName.LocalizedLabels.FirstOrDefault().Label;
+                                
+                                optionsetWriter.Generate();
 
-                                Optionsets.Add(optionset);
-
-                                dataType = $"{EntityLogicalName}_{optionset.LogicalName}";
+                                dataType = optionsetWriter.DataType;
 
                             }
 
-                            entityWriter.AddField(field.LogicalName, field.DisplayName.LocalizedLabels.FirstOrDefault().ToString(), field.AttributeType.ToString());
+                            entityWriter.AddField(field.LogicalName, field.DisplayName.LocalizedLabels.FirstOrDefault().ToString(), dataType);
 
                         
                         }
