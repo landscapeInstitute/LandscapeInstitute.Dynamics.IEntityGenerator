@@ -22,8 +22,9 @@ namespace LandscapeInstitute.Dynamics.IEntityGenerator
         public String OutputDirectory { get; set; }
 
 
-        public String Namespace { get; set; }
+        public String EntityNamespace { get; set; }
 
+        public string OptionsetNamespace { get; set; }
 
         public Boolean HasEntity(string EntityLogicalName)
         {

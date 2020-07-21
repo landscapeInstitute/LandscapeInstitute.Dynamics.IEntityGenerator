@@ -117,8 +117,8 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Classes\EntityCheckBox.cs" />
-    <Compile Include="Classes\EntityToolset.cs" />
     <Compile Include="Classes\EntityWriter.cs" />
+    <Compile Include="Classes\Optionset.cs" />
     <Compile Include="Config.cs" />
     <Compile Include="MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>

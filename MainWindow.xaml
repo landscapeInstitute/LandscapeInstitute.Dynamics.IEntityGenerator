@@ -37,7 +37,7 @@
         <Label Grid.ColumnSpan="2" Content="Username *" HorizontalAlignment="Left" Margin="537,96,0,0" VerticalAlignment="Top" RenderTransformOrigin="-0.506,0.254" Width="202"/>
         <Label Grid.ColumnSpan="2" Content="Password *" HorizontalAlignment="Left" Margin="537,177,0,0" VerticalAlignment="Top" RenderTransformOrigin="-0.506,0.254" Width="202"/>
         <Button x:Name="Generate_Button" Grid.ColumnSpan="2" Content="Generate C#" HorizontalAlignment="Left" Height="44" Margin="692,482,0,0" VerticalAlignment="Top" Width="136" Click="Generate_Button_Click" Background="#FFE0E0E0"/>
-        <TextBox x:Name="OutputDir" Grid.ColumnSpan="2" HorizontalAlignment="Left" Height="22" Margin="542,288,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="351" TextChanged="Validate_TextChanged" BorderBrush="#FFB61111"/>
+        <TextBox x:Name="OutputDir" Grid.ColumnSpan="2" HorizontalAlignment="Left" Height="22" Margin="542,288,0,0" VerticalAlignment="Top" Width="351" TextChanged="Validate_TextChanged" BorderBrush="#FFB61111"/>
         <Label Grid.ColumnSpan="2" Content="Output Directory *" HorizontalAlignment="Left" Margin="537,257,0,0" VerticalAlignment="Top" RenderTransformOrigin="-0.506,0.254" Width="202"/>
         <Button x:Name="SaveConfig_Button" Grid.ColumnSpan="2" Content="Save" HorizontalAlignment="Left" Height="44" Margin="839,482,0,0" VerticalAlignment="Top" Width="136" Click="SaveConfig_Button_Click" Background="#FFE0E0E0"/>
         <Button x:Name="BrowseOutput_Button" Grid.ColumnSpan="2" Content="Browse" HorizontalAlignment="Left" Height="22" Margin="887,288,0,0" VerticalAlignment="Top" Width="91" Click="BrowseOutput_Button_Click" FontSize="10" Background="#FFE0E0E0" RenderTransformOrigin="0.912,0.545"/>
