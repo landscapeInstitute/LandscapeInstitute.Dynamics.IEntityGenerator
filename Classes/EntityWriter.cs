@@ -30,7 +30,7 @@ namespace LandscapeInstitute.Dynamics.IEntityGenerator.Classes
             EntityLogicalName = entityLogicalName;
             NameSpace = classNamespace;
             EntityNiceName = EntityLogicalName.Split('_').LastOrDefault();
-
+            EntityNiceName = char.ToUpper(EntityNiceName[0]) + EntityNiceName.Substring(1);
 
             OutputDirectory = Path.Combine(outputDirectory, "Entites");
             OutputFile = Path.Combine(OutputDirectory, $"{EntityNiceName}.cs");
