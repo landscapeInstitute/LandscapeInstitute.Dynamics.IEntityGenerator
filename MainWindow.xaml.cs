@@ -35,30 +35,26 @@ namespace LandscapeInstitute.Dynamics.IEntityGenerator
         public MainWindow()
         {
             InitializeComponent();
-
             LoadConfig();
-            ClearOutputDirectory();
 
             SetStatus("Ready...");
+
+            this.Dispatcher.Invoke(() =>
+            {
+                GetEntities_Button.IsEnabled = true;
+            });
 
         }
 
         public IOrganizationService GetOrganiszationService()
         {
 
-            if (Username.Text == string.Empty || Password.Text == string.Empty || Url.Text == string.Empty)
+
+            if (_config.Username == string.Empty || _config.Password == string.Empty | _config.Url == string.Empty)
             {
-                SetStatus("Set Dynamics365 Connection Details");
+                MessageBox.Show($"Ensure you have set your Dynamics365 Connection Details", "Check Settings", MessageBoxButton.OK, MessageBoxImage.Error);
                 return null;
             }
-            else
-            {
-                Username.Background = System.Windows.Media.Brushes.White;
-                Password.Background = System.Windows.Media.Brushes.White;
-                Url.Background = System.Windows.Media.Brushes.White;
-            }
-
-            
 
             try
             {
@@ -177,9 +173,9 @@ namespace LandscapeInstitute.Dynamics.IEntityGenerator
                     TreeView.Items.Add(root);
                 });
 
-
                 this.Dispatcher.Invoke(() =>
                 {
+                    Generate_Button.IsEnabled = true;
                     GetEntities_Button.IsEnabled = true;
                 });
 
@@ -249,6 +245,20 @@ namespace LandscapeInstitute.Dynamics.IEntityGenerator
 
             SaveConfig();
 
+            if (_config.EntityNamespace == string.Empty || _config.OptionsetNamespace == string.Empty | _config.OutputDirectory == string.Empty)
+            {
+                MessageBox.Show($"Ensure you have set valid Namespaces and output directory","Check Settings", MessageBoxButton.OK, MessageBoxImage.Error);
+                return;
+            }
+            
+            this.Dispatcher.Invoke(() =>
+            {
+                Generate_Button.IsEnabled = false;
+                GetEntities_Button.IsEnabled = false;
+            });
+
+            ClearOutputDirectory();
+
             if (_organizationService == null) return;
 
             try
@@ -279,14 +289,14 @@ namespace LandscapeInstitute.Dynamics.IEntityGenerator
                 {
 
 
-                    entityWriter = new EntityWriter(entity.LogicalName, _config.OutputDirectory, _config.Namespace);
+                    entityWriter = new EntityWriter(entity.LogicalName, _config.OutputDirectory, _config.EntityNamespace);
 
                     this.Dispatcher.Invoke(() =>
                     {
                         ProgressBar.Value = ProgressBar.Value + 1;
                     });
 
-                    SetStatus($"Requesting Entities Details for {entityWriter.EntityLogicalName}...");
+                    SetStatus($"Generating Entity Code for {entityWriter.EntityLogicalName}...");
 
                     RetrieveEntityRequest retrieveEntityRequest = new RetrieveEntityRequest
                     {
@@ -302,30 +312,55 @@ namespace LandscapeInstitute.Dynamics.IEntityGenerator
                         if(_config.Entities.Where(x => x.LogicalName == entity.LogicalName).FirstOrDefault().Fields.Where(x => x.LogicalName == field.LogicalName).Any())
                         {
 
+
                             var pickList = field as PicklistAttributeMetadata;
+                            var statusList = field as StatusAttributeMetadata;
+
                             var dataType = field.AttributeType.ToString();
 
-
-                            if (pickList != null)
+                            if (pickList != null || statusList != null)
                             {
 
-                                OptionsetWriter optionsetWriter = new OptionsetWriter(entity.LogicalName, pickList.OptionSet.DisplayName.LocalizedLabels.FirstOrDefault().Label, _config.OutputDirectory, _config.OptionsetNamespace);
-
-                                foreach (OptionMetadata option in pickList.OptionSet.Options)
+                                if (pickList != null)
                                 {
-                                    optionsetWriter.AddOption(option.Value ?? default(int), option.Label.LocalizedLabels.FirstOrDefault().Label);
+
+                                    SetStatus($"Generating Optionset Code for {pickList.OptionSet.DisplayName.LocalizedLabels.FirstOrDefault().Label}...");
+                                    OptionsetWriter optionsetWriter = new OptionsetWriter(entity.LogicalName, pickList.OptionSet.DisplayName.LocalizedLabels.FirstOrDefault().Label, _config.OutputDirectory, _config.OptionsetNamespace);
+
+                                    foreach (OptionMetadata option in pickList.OptionSet.Options)
+                                    {
+                                        optionsetWriter.AddOption(option.Value ?? default(int), option.Label.LocalizedLabels.FirstOrDefault().Label);
+                                    }
+
+                                    
+
+                                    optionsetWriter.Generate();
+                                    dataType = optionsetWriter.DataType;
+
                                 }
 
-                                
-                                optionsetWriter.Generate();
+                                if (statusList != null)
+                                {
+                                    SetStatus($"Generating Optionset Code for {statusList.OptionSet.DisplayName.LocalizedLabels.FirstOrDefault().Label}...");
+                                    OptionsetWriter optionsetWriter = new OptionsetWriter(entity.LogicalName, statusList.OptionSet.DisplayName.LocalizedLabels.FirstOrDefault().Label, _config.OutputDirectory, _config.OptionsetNamespace);
 
-                                dataType = optionsetWriter.DataType;
+                                    foreach (OptionMetadata option in statusList.OptionSet.Options)
+                                    {
+
+                                        optionsetWriter.AddOption(option.Value ?? default(int), option.Label.LocalizedLabels.FirstOrDefault().Label);
+                                    }
+
+                                    optionsetWriter.Generate();
+                                    dataType = optionsetWriter.DataType;
+
+                                }
 
                             }
 
-                            entityWriter.AddField(field.LogicalName, field.DisplayName.LocalizedLabels.FirstOrDefault().ToString(), dataType);
+                            string label = field.DisplayName.LocalizedLabels.Any() ? field.DisplayName.LocalizedLabels.FirstOrDefault().ToString() : field.LogicalName;
 
-                        
+                            entityWriter.AddField(field.LogicalName, label, dataType);
+
                         }
 
                     }
@@ -335,20 +370,25 @@ namespace LandscapeInstitute.Dynamics.IEntityGenerator
 
                 }
 
+                this.Dispatcher.Invoke(() =>
+                {
+                    Generate_Button.IsEnabled = true;
+                    GetEntities_Button.IsEnabled = true;
+                });
+
                 SetStatus("Ready...");
 
             }
             catch (Exception ex)
             {
 
-                MessageBox.Show($"{ex.Message}", "Unable to Download Entities", MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show($"{ex.Message}", "Error Generating C# Code, Parse Error", MessageBoxButton.OK, MessageBoxImage.Error);
 
                 this.Dispatcher.Invoke(() =>
                 {
                     GetEntities_Button.IsEnabled = true;
+                    Generate_Button.IsEnabled = true;
                 });
-
-
 
             }
 

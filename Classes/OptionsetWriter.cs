@@ -1,10 +1,14 @@
 ﻿using Microsoft.Xrm.Sdk.Metadata;
+using NArrange.Core.CodeElements;
+using NArrange.CSharp;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 
 namespace LandscapeInstitute.Dynamics.IEntityGenerator.Classes
 {
@@ -25,12 +29,14 @@ namespace LandscapeInstitute.Dynamics.IEntityGenerator.Classes
         public OptionsetWriter(string entityLogicalName, string optionsetName, string outputDirectory, string classNamespace)
         {
             EntityLogicalName = entityLogicalName;
-            OptionsetName = optionsetName;
+
+            OptionsetName = optionsetName.Replace(" ","_").ToLower();
             NameSpace = classNamespace;
             OutputDirectory = Path.Combine(outputDirectory, "Optionsets");
-            OutputFile = Path.Combine(OutputDirectory, $"{optionsetName}.cs");
 
             DataType = $"{EntityLogicalName}_{OptionsetName}";
+
+            OutputFile = Path.Combine(OutputDirectory, $"{DataType}.cs");
 
             Directory.CreateDirectory(OutputDirectory);
 
@@ -46,6 +52,7 @@ namespace LandscapeInstitute.Dynamics.IEntityGenerator.Classes
         private string Content()
         {
             return File.ReadAllText(OutputFile);
+
         }
 
         private void WriteBody()
@@ -66,9 +73,9 @@ namespace LandscapeInstitute.Dynamics.IEntityGenerator.Classes
                 using Felinesoft.Framework.Ecommerce.Models;
                 using System;
 
-                namespace " + NameSpace + @"
+                namespace " + NameSpace + @"{
 
-                    enum " + EntityLogicalName + "_" + OptionsetName + @" 
+                    public enum " + DataType + @" 
                     {
                         {0}
                     }
@@ -79,15 +86,37 @@ namespace LandscapeInstitute.Dynamics.IEntityGenerator.Classes
 
         public void AddOption(int key, string value) {
 
-            Options = Options + $"{key.ToString()} = " + @"""" + value + @"""" + "," + Environment.NewLine;
+            Options = Options + $"{value.Replace(" ","_")} = {key.ToString()}" + "," + Environment.NewLine;
         }
 
         public void Generate()
         {
 
-            Body = Body.Replace("{0}", Options);
-            Body = Body.Replace("            ", "");
-            WriteToFile(Body);
+            try
+            {
+                Options = Options.TrimEnd('\r', '\n');
+                Options = Options.TrimEnd(',');
+                Body = Body.Replace("{0}", Options);
+
+                StringReader reader = new StringReader(Body);
+                CSharpParser parser = new CSharpParser();
+                StringWriter writer = new StringWriter();
+                CSharpWriter formatter = new CSharpWriter();
+                ReadOnlyCollection<ICodeElement> elements = parser.Parse(reader);
+
+                formatter.Write(elements, writer);
+
+                Body = writer.ToString();
+
+                WriteToFile(Body);
+            }
+
+           
+
+            catch (Exception ex)
+            {
+
+                MessageBox.Show($"{ex.Message}", "Error Generating Optionset, Parse Error", MessageBoxButton.OK, MessageBoxImage.Error);
 
             }
 

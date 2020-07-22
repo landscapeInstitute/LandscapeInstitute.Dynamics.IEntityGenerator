@@ -1,10 +1,14 @@
 ﻿using Microsoft.Xrm.Sdk.Metadata;
+using NArrange.Core.CodeElements;
+using NArrange.CSharp;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 
 namespace LandscapeInstitute.Dynamics.IEntityGenerator.Classes
 {
@@ -15,7 +19,7 @@ namespace LandscapeInstitute.Dynamics.IEntityGenerator.Classes
         public string OutputDirectory;
         public string NameSpace;
         public string OutputFile;
-        public List<Optionset> Optionsets;
+        public string EntityNiceName;
 
         private string Classes;
 
@@ -25,12 +29,13 @@ namespace LandscapeInstitute.Dynamics.IEntityGenerator.Classes
         {
             EntityLogicalName = entityLogicalName;
             NameSpace = classNamespace;
+            EntityNiceName = EntityLogicalName.Split('_').LastOrDefault();
+
+
             OutputDirectory = Path.Combine(outputDirectory, "Entites");
-            OutputFile = Path.Combine(OutputDirectory, $"{EntityLogicalName}.cs");
+            OutputFile = Path.Combine(OutputDirectory, $"{EntityNiceName}.cs");
 
             Directory.CreateDirectory(OutputDirectory);
-
-            Optionsets = new List<Optionset>();
 
             WriteBody();
 
@@ -64,9 +69,10 @@ namespace LandscapeInstitute.Dynamics.IEntityGenerator.Classes
             using Felinesoft.Framework.Ecommerce.Models;
             using System;
 
-            namespace " + NameSpace + @"
+            namespace " + NameSpace + @"{
 
-                class " + EntityLogicalName  + @" : IEntity 
+                [EntityName(""" + EntityLogicalName + @""")]
+                public class " + EntityNiceName + @" : IEntity 
                 {
                     {0}
                 }
@@ -87,15 +93,31 @@ namespace LandscapeInstitute.Dynamics.IEntityGenerator.Classes
         public void Generate()
         {
 
-            Body = Body.Replace("{0}", Classes);
-            Body = Body.Replace("            ", "");
-            WriteToFile(Body);
-
-            foreach(Optionset optionset in Optionsets)
+            try
             {
-                
+                Body = Body.Replace("{0}", Classes);
+
+                StringReader reader = new StringReader(Body);
+                CSharpParser parser = new CSharpParser();
+                StringWriter writer = new StringWriter();
+                CSharpWriter formatter = new CSharpWriter();
+                ReadOnlyCollection<ICodeElement> elements = parser.Parse(reader);
+
+                formatter.Write(elements, writer);
+
+                Body = writer.ToString();
+
+                WriteToFile(Body);
 
             }
+            catch (Exception ex)
+            {
+
+                MessageBox.Show($"{ex.Message}", "Error Generating Entity, Parse Error", MessageBoxButton.OK, MessageBoxImage.Error);
+
+            }
+
+
 
         }
 
@@ -145,6 +167,8 @@ namespace LandscapeInstitute.Dynamics.IEntityGenerator.Classes
 
             if (attributeLogicalName == $"statecode")
                 return "Status";
+
+            attributeLogicalName = attributeLogicalName.Split('_').LastOrDefault();
 
             return char.ToUpper(attributeLogicalName[0]) + attributeLogicalName.Substring(1);
 
