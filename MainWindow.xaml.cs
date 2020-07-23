@@ -106,7 +106,7 @@ namespace LandscapeInstitute.Dynamics.IEntityGenerator
                     GetEntities_Button.IsEnabled = false;
                 });
 
-                SetStatus("Requesting Entities List...");
+                SetStatus("Requesting Entities...");
 
                 RetrieveAllEntitiesRequest retrieveEntityRequest = new RetrieveAllEntitiesRequest
                 {
@@ -135,8 +135,11 @@ namespace LandscapeInstitute.Dynamics.IEntityGenerator
 
 
                     MenuItem entityMenuItem = new MenuItem() {
-                        Value = entity.LogicalName,
+                        Value = entity.SchemaName,
                         Checked = _config.HasEntity(entity.LogicalName),
+                        LogicalName = entity.LogicalName,
+                        SchemaName = entity.SchemaName,
+                        DisplayName = entity.DisplayName.LocalizedLabels.Any() ? entity.DisplayName.LocalizedLabels.FirstOrDefault().Label.ToString() : entity.SchemaName,
                         ParentEntity = null,
                         Tag = $"{entity.LogicalName}",
                         Enabled = true
@@ -150,6 +153,9 @@ namespace LandscapeInstitute.Dynamics.IEntityGenerator
                                 Value = field.LogicalName,
                                 Checked = _config.HasEntityField(entity.LogicalName, field.LogicalName),
                                 ParentEntity = entity.LogicalName,
+                                LogicalName = field.LogicalName,
+                                SchemaName = field.SchemaName,
+                                DisplayName = field.DisplayName.LocalizedLabels.Any() ? field.DisplayName.LocalizedLabels.FirstOrDefault().Label.ToString() : field.SchemaName,
                                 Tag = $"{entity.LogicalName}_{field.LogicalName}",
                                 Enabled = true
                             };
@@ -289,7 +295,13 @@ namespace LandscapeInstitute.Dynamics.IEntityGenerator
                 {
 
 
-                    entityWriter = new EntityWriter(entity.LogicalName, _config.OutputDirectory, _config.EntityNamespace);
+                    entityWriter = new EntityWriter(
+                        entity.LogicalName,
+                        entity.SchemaName,
+                        entity.DisplayName,
+                        _config.OutputDirectory, 
+                        _config.EntityNamespace
+                    );
 
                     this.Dispatcher.Invoke(() =>
                     {
@@ -315,7 +327,6 @@ namespace LandscapeInstitute.Dynamics.IEntityGenerator
 
                             var pickList = field as PicklistAttributeMetadata;
                             var statusList = field as StatusAttributeMetadata;
-
                             var dataType = field.AttributeType.ToString();
 
                             if (pickList != null || statusList != null)
@@ -357,9 +368,9 @@ namespace LandscapeInstitute.Dynamics.IEntityGenerator
 
                             }
 
-                            string label = field.DisplayName.LocalizedLabels.Any() ? field.DisplayName.LocalizedLabels.FirstOrDefault().ToString() : field.LogicalName;
+                            string displayName = field.DisplayName.LocalizedLabels.Any() ? field.DisplayName.LocalizedLabels.FirstOrDefault().ToString() : field.LogicalName;
 
-                            entityWriter.AddField(field.LogicalName, label, dataType);
+                            entityWriter.AddField(field.LogicalName, displayName, dataType, (field.RequiredLevel.Value == AttributeRequiredLevel.ApplicationRequired || field.RequiredLevel.Value == AttributeRequiredLevel.SystemRequired) ? false : true);
 
                         }
 
@@ -438,6 +449,7 @@ namespace LandscapeInstitute.Dynamics.IEntityGenerator
 
 
         }
+
         public void SetStatus(string statusText)
         {
 
@@ -463,13 +475,19 @@ namespace LandscapeInstitute.Dynamics.IEntityGenerator
 
             public Boolean Checked { get; set; }
 
-            public String ParentEntity { get; set; }
+            public string ParentEntity { get; set; }
 
-            public String Tag { get; set; }
+            public string LogicalName { get; set; }
+
+            public string SchemaName { get; set; }
+
+            public string Tag { get; set; }
 
             public Boolean Enabled { get; set; }
 
             public Boolean IsExpanded { get; set; }
+
+            public string DisplayName { get; set; }
 
             public ObservableCollection<MenuItem> Items { get; set; }
         }
@@ -482,31 +500,32 @@ namespace LandscapeInstitute.Dynamics.IEntityGenerator
         {
             EntityCheckBox checkbox = (EntityCheckBox)sender;
 
+            /* No Parent, is entity */
             if (string.IsNullOrWhiteSpace(checkbox.ParentEntity))
             {
 
                 if (checkbox.IsMouseOver)
                 {
-                    FindVisualChildren<EntityCheckBox>(this).Where(x => x.ParentEntity == checkbox.Content.ToString() && x.IsChecked == false).ToList().ForEach(x => x.IsChecked = true);
+                    FindVisualChildren<EntityCheckBox>(this).Where(x => x.ParentEntity == checkbox.LogicalName && x.IsChecked == false).ToList().ForEach(x => x.IsChecked = true);
                 }
 
-                var id = FindVisualChildren<EntityCheckBox>(this).Where(x => x.ParentEntity == checkbox.Content.ToString() && x.Content.ToString() == $"{checkbox.Content}id").ToList();
-                var statecode = FindVisualChildren<EntityCheckBox>(this).Where(x => x.ParentEntity == checkbox.Content.ToString() && x.Content.ToString() == "statecode").ToList();
-                var statuscode = FindVisualChildren<EntityCheckBox>(this).Where(x => x.ParentEntity == checkbox.Content.ToString() && x.Content.ToString() == "statuscode").ToList();
+                var id = FindVisualChildren<EntityCheckBox>(this).Where(x => x.ParentEntity == checkbox.LogicalName && x.LogicalName == $"{checkbox.Content}id").ToList();
+                var statecode = FindVisualChildren<EntityCheckBox>(this).Where(x => x.ParentEntity == checkbox.LogicalName && x.LogicalName == "statecode").ToList();
+                var statuscode = FindVisualChildren<EntityCheckBox>(this).Where(x => x.ParentEntity == checkbox.LogicalName && x.LogicalName == "statuscode").ToList();
 
                 id.ForEach(x => x.IsChecked = true);
                 statecode.ForEach(x => x.IsChecked = true);
                 statuscode.ForEach(x => x.IsChecked = true);
 
-                _config.AddEntity(checkbox.Content.ToString());
+                _config.AddEntity(checkbox.LogicalName, checkbox.SchemaName, checkbox.DisplayName);
             }
-            else
+            else /* Has Parent is Field */
             {
 
-                var parentCheckbox = FindVisualChildren<EntityCheckBox>(this).Where(x => x.Content.ToString() == checkbox.ParentEntity).FirstOrDefault();
+                var parentCheckbox = FindVisualChildren<EntityCheckBox>(this).Where(x => x.LogicalName == checkbox.ParentEntity).FirstOrDefault();
                 parentCheckbox.IsChecked = true;
 
-                _config.AddEntityField(checkbox.ParentEntity, checkbox.Content.ToString());
+                _config.AddEntityField(parentCheckbox.LogicalName, parentCheckbox.SchemaName, parentCheckbox.DisplayName, checkbox.LogicalName, checkbox.SchemaName, checkbox.DisplayName);
             }
 
             SaveConfig();
@@ -517,27 +536,28 @@ namespace LandscapeInstitute.Dynamics.IEntityGenerator
         {
             EntityCheckBox checkbox = (EntityCheckBox)sender;
 
+            /* No Parent, is entity */
             if (string.IsNullOrWhiteSpace(checkbox.ParentEntity))
             {
 
-                FindVisualChildren<EntityCheckBox>(this).Where(x => x.ParentEntity == checkbox.Content && x.IsChecked == true).ToList().ForEach(x => x.IsChecked = false);
+                FindVisualChildren<EntityCheckBox>(this).Where(x => x.ParentEntity == checkbox.LogicalName && x.IsChecked == true).ToList().ForEach(x => x.IsChecked = false);
 
-                _config.RemoveEntity(checkbox.Content.ToString());
+                _config.RemoveEntity(checkbox.LogicalName);
 
             }
-            else
+            else /* Has Parent is Field */
             {
 
                 var checkedFields = FindVisualChildren<EntityCheckBox>(this).Where(x => x.ParentEntity == checkbox.ParentEntity && x.IsChecked == true && x.IsEnabled == true).Count();
 
                 if (checkedFields == 0)
                 {
-                    var parentCheckbox = FindVisualChildren<EntityCheckBox>(this).Where(x => x.Content == checkbox.ParentEntity).FirstOrDefault();
+                    var parentCheckbox = FindVisualChildren<EntityCheckBox>(this).Where(x => x.LogicalName == checkbox.ParentEntity).FirstOrDefault();
                     parentCheckbox.IsChecked = false;
 
                 }
 
-                _config.RemoveEntityField(checkbox.ParentEntity, checkbox.Content.ToString());
+                _config.RemoveEntityField(checkbox.ParentEntity, checkbox.LogicalName);
             }
 
             SaveConfig();

@@ -51,15 +51,17 @@ namespace LandscapeInstitute.Dynamics.IEntityGenerator
             return false;
         }
 
-        public void AddEntity(string EntityLogicalName)
+        public void AddEntity(string LogicalName, string SchemaName, string DisplayName )
         {
 
-            if (!HasEntity(EntityLogicalName))
+            if (!HasEntity(LogicalName))
             {
 
                 Entities.Add(new Entity()
                 {
-                    LogicalName = EntityLogicalName,
+                    LogicalName = LogicalName,
+                    SchemaName = SchemaName,
+                    DisplayName = DisplayName,
                     Fields = new List<Field>()
                 });
 
@@ -67,20 +69,22 @@ namespace LandscapeInstitute.Dynamics.IEntityGenerator
 
         }
 
-        public void AddEntityField(string EntityLogicalName, string FieldLogicalName)
+        public void AddEntityField(string ParentLogicalName, string ParentSchemaName, string ParentDisplayName, string LogicalName, string SchemaName, string DisplayName)
         {
 
-            if (!HasEntity(EntityLogicalName))
+            if (!HasEntity(ParentLogicalName))
             {
-                AddEntity(EntityLogicalName);
+                AddEntity(ParentLogicalName, ParentSchemaName, ParentDisplayName);
             }
 
-            if(!HasEntityField(EntityLogicalName, FieldLogicalName))
+            if(!HasEntityField(ParentLogicalName, LogicalName))
             {
 
-                Entities.Where(x => x.LogicalName == EntityLogicalName).FirstOrDefault().Fields.Add(new Field()
+                Entities.Where(x => x.LogicalName == ParentLogicalName).FirstOrDefault().Fields.Add(new Field()
                 {
-                    LogicalName = FieldLogicalName
+                    LogicalName = LogicalName,
+                    SchemaName = SchemaName,
+                    DisplayName = DisplayName
 
                 });
 
@@ -117,6 +121,8 @@ namespace LandscapeInstitute.Dynamics.IEntityGenerator
     public class Entity
     {
         public string LogicalName;
+        public string SchemaName;
+        public string DisplayName;
         public List<Field> Fields;
     }
 
@@ -124,5 +130,7 @@ namespace LandscapeInstitute.Dynamics.IEntityGenerator
     {
 
         public string LogicalName;
+        public string SchemaName;
+        public string DisplayName;
     }
 }

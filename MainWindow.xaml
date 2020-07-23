@@ -18,7 +18,7 @@
             <TreeView.ItemTemplate>
                 <HierarchicalDataTemplate DataType="{x:Type MenuItem}" ItemsSource="{Binding Items}">
                     <StackPanel Orientation="Horizontal">
-                        <local:EntityCheckBox IsEnabled="{Binding Enabled}" IsChecked="{Binding Checked}" Content="{Binding Value}" Tag="{Binding Tag}" ParentEntity="{Binding ParentEntity}" Checked="CheckBox_Checked" Unchecked="CheckBox_UnChecked"/>
+                        <local:EntityCheckBox IsEnabled="{Binding Enabled}" IsChecked="{Binding Checked}" Content="{Binding DisplayName}" Tag="{Binding Tag}" ParentEntity="{Binding ParentEntity}" LogicalName="{Binding LogicalName}" SchemaName="{Binding SchemaName}" DisplayName="{Binding DisplayName}" Checked="CheckBox_Checked" Unchecked="CheckBox_UnChecked"/>
                     </StackPanel>
                 </HierarchicalDataTemplate>
             </TreeView.ItemTemplate>

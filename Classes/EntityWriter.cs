@@ -16,24 +16,27 @@ namespace LandscapeInstitute.Dynamics.IEntityGenerator.Classes
     {
 
         public string EntityLogicalName;
+        public string EntitySchemaName;
+        public string EntityDisplayName;
         public string OutputDirectory;
         public string NameSpace;
         public string OutputFile;
-        public string EntityNiceName;
+        public string EntityPascalCase;
 
         private string Classes;
 
         private string Body;
 
-        public EntityWriter(string entityLogicalName, string outputDirectory, string classNamespace)
+        public EntityWriter(string entityLogicalName, string entitySchemaName, string entityDisplayName, string outputDirectory, string classNamespace)
         {
             EntityLogicalName = entityLogicalName;
             NameSpace = classNamespace;
-            EntityNiceName = EntityLogicalName.Split('_').LastOrDefault();
-            EntityNiceName = char.ToUpper(EntityNiceName[0]) + EntityNiceName.Substring(1);
+            EntitySchemaName = entitySchemaName;
+            EntityDisplayName = entityDisplayName;
+            EntityPascalCase = entityDisplayName.Replace(" ", String.Empty);
 
             OutputDirectory = Path.Combine(outputDirectory, "Entites");
-            OutputFile = Path.Combine(OutputDirectory, $"{EntityNiceName}.cs");
+            OutputFile = Path.Combine(OutputDirectory, $"{EntityPascalCase}.cs");
 
             Directory.CreateDirectory(OutputDirectory);
 
@@ -72,7 +75,7 @@ namespace LandscapeInstitute.Dynamics.IEntityGenerator.Classes
             namespace " + NameSpace + @"{
 
                 [EntityName(""" + EntityLogicalName + @""")]
-                public class " + EntityNiceName + @" : IEntity 
+                public class " + EntityPascalCase + @" : IEntity 
                 {
                     {0}
                 }
@@ -87,7 +90,7 @@ namespace LandscapeInstitute.Dynamics.IEntityGenerator.Classes
             Classes = Classes + (@"
    " + (optional ? "[Optional]" : "") + @"
                     [FieldName(""" + fieldLogicalName + @""")]
-                    public " + AttributeType(dataType) + @" " + FieldLogicalName(fieldLogicalName) + @" { get; set; }");
+                    public " + AttributeType(dataType, optional) + @" " + FieldName(fieldLogicalName, fieldDisplayName) + @" { get; set; }");
         }
 
         public void Generate()
@@ -121,8 +124,10 @@ namespace LandscapeInstitute.Dynamics.IEntityGenerator.Classes
 
         }
 
-        public string AttributeType(string attributeType)
+        public string AttributeType(string attributeType, Boolean optional)
         {
+
+
 
             switch (attributeType)
             {
@@ -148,6 +153,11 @@ namespace LandscapeInstitute.Dynamics.IEntityGenerator.Classes
                 case "Status":
                     return $"{EntityLogicalName}Statuscode";
 
+                case "DateTime":
+                    return $"DateTime{(optional ? "?" : "")}";
+
+                case "Boolean":
+                    return $"Boolean{(optional ? "?" : "")}";
 
             }
 
@@ -156,21 +166,19 @@ namespace LandscapeInstitute.Dynamics.IEntityGenerator.Classes
 
         }
 
-        public string FieldLogicalName(string attributeLogicalName)
+        public string FieldName(string fieldLogicalName, string fieldDisplayName)
         {
 
-            if (attributeLogicalName == $"{EntityLogicalName.ToLower()}id")
+            if (fieldLogicalName == $"{EntityLogicalName.ToLower()}id")
                 return "Id";
 
-            if (attributeLogicalName == $"statuscode")
+            if (fieldLogicalName == $"statuscode")
                 return "StatusReason";
 
-            if (attributeLogicalName == $"statecode")
-                return "Status";
+            if (fieldLogicalName == $"statecode")
+                return "State";
 
-            attributeLogicalName = attributeLogicalName.Split('_').LastOrDefault();
-
-            return char.ToUpper(attributeLogicalName[0]) + attributeLogicalName.Substring(1);
+            return fieldDisplayName;
 
         }
 
