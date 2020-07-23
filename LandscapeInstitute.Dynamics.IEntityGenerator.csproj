@@ -126,6 +126,7 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Classes\EntityCheckBox.cs" />
+    <Compile Include="Classes\LogWriter.cs" />
     <Compile Include="Classes\OptionsetWriter.cs" />
     <Compile Include="Classes\EntityWriter.cs" />
     <Compile Include="Config.cs" />

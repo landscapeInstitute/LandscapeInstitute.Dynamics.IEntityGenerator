@@ -7,6 +7,7 @@ using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows;
 
@@ -86,7 +87,11 @@ namespace LandscapeInstitute.Dynamics.IEntityGenerator.Classes
         }
 
         public void AddField(string fieldLogicalName, string fieldDisplayName, string dataType, Boolean optional = false) {
-      
+
+            Regex rgx = new Regex("[^a-zA-Z0-9 -]");
+            fieldDisplayName = rgx.Replace(fieldDisplayName, "");
+            fieldDisplayName = fieldDisplayName.Replace(" ", "");
+
             Classes = Classes + (@"
    " + (optional ? "[Optional]" : "") + @"
                     [FieldName(""" + fieldLogicalName + @""")]
@@ -115,9 +120,9 @@ namespace LandscapeInstitute.Dynamics.IEntityGenerator.Classes
             }
             catch (Exception ex)
             {
-
-                MessageBox.Show($"{ex.Message}", "Error Generating Entity, Parse Error", MessageBoxButton.OK, MessageBoxImage.Error);
-
+                LogWriter.LastFailed(Body);
+                MessageBox.Show($"{ex.Message}", "Error Parsing Entity CS, check last failed, Parse Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                
             }
 
 

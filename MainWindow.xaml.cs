@@ -115,7 +115,7 @@ namespace LandscapeInstitute.Dynamics.IEntityGenerator
                 };
 
                 RetrieveAllEntitiesResponse retrieveAllEntitiesResponse = (RetrieveAllEntitiesResponse)_organizationService.Execute(retrieveEntityRequest);
-                var entities = retrieveAllEntitiesResponse.EntityMetadata.OrderBy(x => x.LogicalName);
+                var entities = retrieveAllEntitiesResponse.EntityMetadata.OrderBy(x => x.DisplayName.LocalizedLabels.Any() ? x.DisplayName.LocalizedLabels.FirstOrDefault().Label.ToString() : x.LogicalName);
 
                 this.Dispatcher.Invoke(() =>
                 {
@@ -160,9 +160,10 @@ namespace LandscapeInstitute.Dynamics.IEntityGenerator
                                 Enabled = true
                             };
 
-                            if (fieldMenuItem.Value == $"{entity.LogicalName}id") fieldMenuItem.Enabled = false;
-                            if (fieldMenuItem.Value == $"statecode") fieldMenuItem.Enabled = false;
-                            if (fieldMenuItem.Value == $"statuscode") fieldMenuItem.Enabled = false;
+                            if (fieldMenuItem.LogicalName == $"{entity.LogicalName}id") fieldMenuItem.Enabled = false;
+                            if (fieldMenuItem.LogicalName == $"{entity.LogicalName}id") fieldMenuItem.DisplayName = "Id";
+                            if (fieldMenuItem.LogicalName == $"statecode") fieldMenuItem.Enabled = false;
+                            if (fieldMenuItem.LogicalName == $"statuscode") fieldMenuItem.Enabled = false;
 
                             entityMenuItem.Items.Add(fieldMenuItem);
                         }
@@ -308,7 +309,7 @@ namespace LandscapeInstitute.Dynamics.IEntityGenerator
                         ProgressBar.Value = ProgressBar.Value + 1;
                     });
 
-                    SetStatus($"Generating Entity Code for {entityWriter.EntityLogicalName}...");
+                    SetStatus($"Generating {entityWriter.EntityLogicalName}...");
 
                     RetrieveEntityRequest retrieveEntityRequest = new RetrieveEntityRequest
                     {
@@ -329,22 +330,22 @@ namespace LandscapeInstitute.Dynamics.IEntityGenerator
                             var statusList = field as StatusAttributeMetadata;
                             var dataType = field.AttributeType.ToString();
 
+
                             if (pickList != null || statusList != null)
                             {
 
                                 if (pickList != null)
                                 {
 
-                                    SetStatus($"Generating Optionset Code for {pickList.OptionSet.DisplayName.LocalizedLabels.FirstOrDefault().Label}...");
-                                    OptionsetWriter optionsetWriter = new OptionsetWriter(entity.LogicalName, pickList.OptionSet.DisplayName.LocalizedLabels.FirstOrDefault().Label, _config.OutputDirectory, _config.OptionsetNamespace);
+                                    SetStatus($"Generating Optionset for {pickList.OptionSet.DisplayName.LocalizedLabels.FirstOrDefault().Label}...");
+                                    OptionsetWriter optionsetWriter = new OptionsetWriter(entity.LogicalName, entity.DisplayName, pickList.OptionSet.DisplayName.LocalizedLabels.FirstOrDefault().Label, _config.OutputDirectory, _config.OptionsetNamespace);
 
                                     foreach (OptionMetadata option in pickList.OptionSet.Options)
                                     {
-                                        optionsetWriter.AddOption(option.Value ?? default(int), option.Label.LocalizedLabels.FirstOrDefault().Label);
+                                        optionsetWriter.AddOption(option.Value ?? default(int), option.Label.LocalizedLabels.FirstOrDefault().Label.ToString());
                                     }
 
                                     
-
                                     optionsetWriter.Generate();
                                     dataType = optionsetWriter.DataType;
 
@@ -352,13 +353,13 @@ namespace LandscapeInstitute.Dynamics.IEntityGenerator
 
                                 if (statusList != null)
                                 {
-                                    SetStatus($"Generating Optionset Code for {statusList.OptionSet.DisplayName.LocalizedLabels.FirstOrDefault().Label}...");
-                                    OptionsetWriter optionsetWriter = new OptionsetWriter(entity.LogicalName, statusList.OptionSet.DisplayName.LocalizedLabels.FirstOrDefault().Label, _config.OutputDirectory, _config.OptionsetNamespace);
+                                    SetStatus($"Generating Optionset for {statusList.OptionSet.DisplayName.LocalizedLabels.FirstOrDefault().Label}...");
+                                    OptionsetWriter optionsetWriter = new OptionsetWriter(entity.LogicalName, entity.DisplayName, statusList.OptionSet.DisplayName.LocalizedLabels.FirstOrDefault().Label.ToString(), _config.OutputDirectory, _config.OptionsetNamespace);
 
                                     foreach (OptionMetadata option in statusList.OptionSet.Options)
                                     {
 
-                                        optionsetWriter.AddOption(option.Value ?? default(int), option.Label.LocalizedLabels.FirstOrDefault().Label);
+                                        optionsetWriter.AddOption(option.Value ?? default(int), option.Label.LocalizedLabels.FirstOrDefault().Label.ToString());
                                     }
 
                                     optionsetWriter.Generate();
@@ -368,7 +369,7 @@ namespace LandscapeInstitute.Dynamics.IEntityGenerator
 
                             }
 
-                            string displayName = field.DisplayName.LocalizedLabels.Any() ? field.DisplayName.LocalizedLabels.FirstOrDefault().ToString() : field.LogicalName;
+                            string displayName = field.DisplayName.LocalizedLabels.Any() ? field.DisplayName.LocalizedLabels.FirstOrDefault().Label.ToString() : field.LogicalName;
 
                             entityWriter.AddField(field.LogicalName, displayName, dataType, (field.RequiredLevel.Value == AttributeRequiredLevel.ApplicationRequired || field.RequiredLevel.Value == AttributeRequiredLevel.SystemRequired) ? false : true);
 
@@ -509,7 +510,7 @@ namespace LandscapeInstitute.Dynamics.IEntityGenerator
                     FindVisualChildren<EntityCheckBox>(this).Where(x => x.ParentEntity == checkbox.LogicalName && x.IsChecked == false).ToList().ForEach(x => x.IsChecked = true);
                 }
 
-                var id = FindVisualChildren<EntityCheckBox>(this).Where(x => x.ParentEntity == checkbox.LogicalName && x.LogicalName == $"{checkbox.Content}id").ToList();
+                var id = FindVisualChildren<EntityCheckBox>(this).Where(x => x.ParentEntity == checkbox.LogicalName && x.LogicalName == $"{checkbox.LogicalName}id").ToList();
                 var statecode = FindVisualChildren<EntityCheckBox>(this).Where(x => x.ParentEntity == checkbox.LogicalName && x.LogicalName == "statecode").ToList();
                 var statuscode = FindVisualChildren<EntityCheckBox>(this).Where(x => x.ParentEntity == checkbox.LogicalName && x.LogicalName == "statuscode").ToList();
 

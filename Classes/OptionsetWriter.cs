@@ -4,9 +4,11 @@ using NArrange.CSharp;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows;
 
@@ -16,25 +18,33 @@ namespace LandscapeInstitute.Dynamics.IEntityGenerator.Classes
     {
 
         public string EntityLogicalName;
+        public string EntityDisplayName;
         public string OptionsetName;
         public string OutputDirectory;
         public string NameSpace;
         public string OutputFile;
+        public string EntityPascalCase;
+        public string OptionNamePascalCase;
 
         private string Options;
         private string Body;
 
         public string DataType;
 
-        public OptionsetWriter(string entityLogicalName, string optionsetName, string outputDirectory, string classNamespace)
+        public OptionsetWriter(string entityLogicalName, string entityDisplayName, string optionsetName, string outputDirectory, string classNamespace)
         {
             EntityLogicalName = entityLogicalName;
 
-            OptionsetName = optionsetName.Replace(" ","_").ToLower();
+            EntityDisplayName = entityDisplayName;
+
+            EntityPascalCase = entityDisplayName.Replace(" ", String.Empty);
+            TextInfo info = CultureInfo.CurrentCulture.TextInfo;
+            OptionNamePascalCase = info.ToTitleCase(optionsetName.Replace("_","")).Replace(" ", string.Empty);
+
             NameSpace = classNamespace;
             OutputDirectory = Path.Combine(outputDirectory, "Optionsets");
 
-            DataType = $"{EntityLogicalName}_{OptionsetName}";
+            DataType = $"{EntityPascalCase}{OptionNamePascalCase}";
 
             OutputFile = Path.Combine(OutputDirectory, $"{DataType}.cs");
 
@@ -115,9 +125,8 @@ namespace LandscapeInstitute.Dynamics.IEntityGenerator.Classes
 
             catch (Exception ex)
             {
-
-                MessageBox.Show($"{ex.Message}", "Error Generating Optionset, Parse Error", MessageBoxButton.OK, MessageBoxImage.Error);
-
+                LogWriter.LastFailed(Body);
+                MessageBox.Show($"{ex.Message}", "Error Parsing Optionset CS, check last failed, Parse Error", MessageBoxButton.OK, MessageBoxImage.Error); 
             }
 
         }
