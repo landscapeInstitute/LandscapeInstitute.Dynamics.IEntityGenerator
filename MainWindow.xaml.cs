@@ -88,7 +88,6 @@ namespace LandscapeInstitute.Dynamics.IEntityGenerator
 
             SetStatus("Connecting...");
 
-
             this.Dispatcher.Invoke(() =>
             {
                 _organizationService = GetOrganiszationService();
@@ -133,7 +132,6 @@ namespace LandscapeInstitute.Dynamics.IEntityGenerator
                         ProgressBar.Value = ProgressBar.Value + 1;
                     });
 
-
                     MenuItem entityMenuItem = new MenuItem() {
                         Value = entity.SchemaName,
                         Checked = _config.HasEntity(entity.LogicalName),
@@ -142,10 +140,11 @@ namespace LandscapeInstitute.Dynamics.IEntityGenerator
                         DisplayName = entity.DisplayName.LocalizedLabels.Any() ? entity.DisplayName.LocalizedLabels.FirstOrDefault().Label.ToString() : entity.SchemaName,
                         ParentEntity = null,
                         Tag = $"{entity.LogicalName}",
+                        Visibility = Visibility.Visible,
                         Enabled = true
                     };
 
-                    foreach (AttributeMetadata field in entity.Attributes.OrderBy(x => x.LogicalName))
+                    foreach (AttributeMetadata field in entity.Attributes.OrderBy(x => x.DisplayName.LocalizedLabels.Any() ? x.DisplayName.LocalizedLabels.FirstOrDefault().Label.ToString() : x.LogicalName))
                     {
                         if (!string.IsNullOrWhiteSpace(field.LogicalName))
                         {
@@ -157,6 +156,7 @@ namespace LandscapeInstitute.Dynamics.IEntityGenerator
                                 SchemaName = field.SchemaName,
                                 DisplayName = field.DisplayName.LocalizedLabels.Any() ? field.DisplayName.LocalizedLabels.FirstOrDefault().Label.ToString() : field.SchemaName,
                                 Tag = $"{entity.LogicalName}_{field.LogicalName}",
+                                Visibility = Visibility.Visible,
                                 Enabled = true
                             };
 
@@ -164,13 +164,22 @@ namespace LandscapeInstitute.Dynamics.IEntityGenerator
                             if (fieldMenuItem.LogicalName == $"{entity.LogicalName}id") fieldMenuItem.DisplayName = "Id";
                             if (fieldMenuItem.LogicalName == $"statecode") fieldMenuItem.Enabled = false;
                             if (fieldMenuItem.LogicalName == $"statuscode") fieldMenuItem.Enabled = false;
+                            if (fieldMenuItem.DisplayName.Substring(0).ToLower() == fieldMenuItem.DisplayName.Substring(0)) fieldMenuItem.Visibility = Visibility.Hidden;
 
-                            entityMenuItem.Items.Add(fieldMenuItem);
+                            if(fieldMenuItem.Visibility == Visibility.Visible)
+                            {
+                                entityMenuItem.Items.Add(fieldMenuItem);
+                            }
+                            
                         }
 
                     }
 
-                    root.Items.Add(entityMenuItem);
+                    if(entityMenuItem.Visibility == Visibility.Visible)
+                    {
+                        root.Items.Add(entityMenuItem);
+                    }
+                    
 
                 }
 
@@ -489,6 +498,8 @@ namespace LandscapeInstitute.Dynamics.IEntityGenerator
             public Boolean IsExpanded { get; set; }
 
             public string DisplayName { get; set; }
+
+            public Visibility Visibility { get; set; }
 
             public ObservableCollection<MenuItem> Items { get; set; }
         }
