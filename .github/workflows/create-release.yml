@@ -18,7 +18,7 @@ jobs:
           timeZone: 8
           format: 'YYYYMMDD' 
           
-      - name: Is a Stable Release
+      - name: Name Release
         run:  echo "::set-env name=RELEASENAME::${{ steps.time.outputs.time }}"          
           
       - name: Install Dotnet
@@ -27,7 +27,7 @@ jobs:
           dotnet-version: '3.1.x' # SDK Version to use; x will use the latest version of the 3.1 channel
 
       - name: Dotnet Build Updater                 
-        run: dotnet build --configuration Release LandscapeInstitute.Dynamics.IEntityGenerator
+        run: dotnet build --configuration Release LandscapeInstitute.Dynamics.IEntityGenerator.csproj
           
   
       - name: Zip Release
