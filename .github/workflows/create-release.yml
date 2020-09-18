@@ -28,12 +28,15 @@ jobs:
 
       - name: Setup Nuget.exe
         uses: warrenbuckley/Setup-Nuget@v1
-      
+        
       - name: Nuget Restore 
         run: nuget restore .\LandscapeInstitute.Dynamics.IEntityGenerator.sln
 
-      - name: Dotnet Build Updater                 
-        run: dotnet build --configuration Release LandscapeInstitute.Dynamics.IEntityGenerator.csproj
+      - name: Add msbuild to PATH
+        uses: microsoft/setup-msbuild@v1.0.1
+
+      - name: Name Release
+        run:  msbuild .\LandscapeInstitute.Dynamics.IEntityGenerator.csproj    
           
   
       - name: Zip Release
