@@ -20,25 +20,33 @@ namespace LandscapeInstitute.Dynamics.IEntityGenerator.Classes
         public string EntitySchemaName;
         public string EntityDisplayName;
         public string OutputDirectory;
-        public string NameSpace;
+        public string Namespace;
+        public string OptionSetNamespace;
         public string OutputFile;
         public string EntityPascalCase;
+        public Boolean UsePartial;
+        public string Usings;
+        public string OutputSubDirectory;
 
         private string Classes;
 
         private string Body;
 
-        public EntityWriter(string entityLogicalName, string entitySchemaName, string entityDisplayName, string outputDirectory, string classNamespace)
+        public EntityWriter(string entityLogicalName, string entitySchemaName, string entityDisplayName, string outputDirectory, string classNamespace, string optionSetNamespace, Boolean usePartial, string usings, string entityOutputDir)
         {
             EntityLogicalName = entityLogicalName;
-            NameSpace = classNamespace;
+            Namespace = classNamespace;
+            OptionSetNamespace = optionSetNamespace;
             EntitySchemaName = entitySchemaName;
             EntityDisplayName = entityDisplayName;
             EntityPascalCase = entityDisplayName.Replace(" ", String.Empty);
 
-            OutputDirectory = Path.Combine(outputDirectory, "Entites");
-            OutputFile = Path.Combine(OutputDirectory, $"{EntityPascalCase}.cs");
+            OutputSubDirectory = entityOutputDir;
 
+            UsePartial = usePartial;
+            OutputDirectory = Path.Combine(outputDirectory, OutputSubDirectory);
+            OutputFile = Path.Combine(OutputDirectory, $"{EntityPascalCase}.cs");
+            Usings = usings.TrimEnd('\r', '\n') + Environment.NewLine; 
             Directory.CreateDirectory(OutputDirectory);
 
             WriteBody();
@@ -68,15 +76,19 @@ namespace LandscapeInstitute.Dynamics.IEntityGenerator.Classes
             // </auto-generated>
             //------------------------------------------------------------------------------
 
-            using Felinesoft.Framework.Core;
-            using Felinesoft.Framework.CoreInterfaces;
-            using Felinesoft.Framework.Ecommerce.Models;
+            using " + OptionSetNamespace + ";" + Environment.NewLine + 
+            Usings + @"           
+            using Newtonsoft.Json;
             using System;
+            using System.ComponentModel.DataAnnotations;
+            using System.ComponentModel.DataAnnotations.Schema;
+            using System.Runtime.InteropServices;
+            using System.Runtime.Serialization;
 
-            namespace " + NameSpace + @"{
+            namespace " + Namespace + @"{
 
-                [EntityName(""" + EntityLogicalName + @""")]
-                public class " + EntityPascalCase + @" : IEntity 
+                [DataContract(Name=""" + EntityLogicalName + @""")]
+                public " + (UsePartial ? "partial" : "") + @" class " + EntityPascalCase + @" : IEntity 
                 {
                     {0}
                 }
@@ -93,8 +105,8 @@ namespace LandscapeInstitute.Dynamics.IEntityGenerator.Classes
             fieldDisplayName = fieldDisplayName.Replace(" ", "");
 
             Classes = Classes + (@"
-   " + (optional ? "[Optional]" : "") + @"
-                    [FieldName(""" + fieldLogicalName + @""")]
+   " + (optional ? "" : "[Required]") + @"
+                    [JsonProperty(""" + fieldLogicalName + @""")]
                     public " + AttributeType(dataType, optional) + @" " + FieldName(fieldLogicalName, fieldDisplayName) + @" { get; set; }");
         }
 
@@ -121,7 +133,7 @@ namespace LandscapeInstitute.Dynamics.IEntityGenerator.Classes
             catch (Exception ex)
             {
                 LogWriter.LastFailed(Body);
-                MessageBox.Show($"{ex.Message}", "Error Parsing Entity CS, check last failed, Parse Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show($"{ex.Message}", $"Error Generating {EntityLogicalName} Code", MessageBoxButton.OK, MessageBoxImage.Error);
                 
             }
 
@@ -163,6 +175,9 @@ namespace LandscapeInstitute.Dynamics.IEntityGenerator.Classes
 
                 case "Boolean":
                     return $"Boolean{(optional ? "?" : "")}";
+
+                case "Virtual":
+                    return "byte[]";
 
             }
 

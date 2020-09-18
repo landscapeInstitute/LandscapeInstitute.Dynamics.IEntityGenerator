@@ -240,15 +240,35 @@ namespace LandscapeInstitute.Dynamics.IEntityGenerator
 
             if (Directory.Exists(_config.OutputDirectory))
             {
-                System.IO.DirectoryInfo di = new DirectoryInfo(_config.OutputDirectory);
+                System.IO.DirectoryInfo osod = new DirectoryInfo(Path.Combine(_config.OutputDirectory,_config.OptionsetOutputDir));
 
-                foreach (FileInfo file in di.GetFiles())
+                if (Directory.Exists(Path.Combine(_config.OutputDirectory, _config.OptionsetOutputDir)))
                 {
-                    file.Delete();
+
+                    foreach (FileInfo file in osod.GetFiles())
+                    {
+                        file.Delete();
+                    }
+                    foreach (DirectoryInfo dir in osod.GetDirectories())
+                    {
+                        dir.Delete(true);
+                    }
+
                 }
-                foreach (DirectoryInfo dir in di.GetDirectories())
+
+                if (Directory.Exists(Path.Combine(_config.OutputDirectory, _config.EntityOutputDir)))
                 {
-                    dir.Delete(true);
+                    System.IO.DirectoryInfo eod = new DirectoryInfo(Path.Combine(_config.OutputDirectory, _config.EntityOutputDir));
+
+                    foreach (FileInfo file in eod.GetFiles())
+                    {
+                        file.Delete();
+                    }
+                    foreach (DirectoryInfo dir in eod.GetDirectories())
+                    {
+                        dir.Delete(true);
+                    }
+
                 }
             }
 
@@ -281,9 +301,13 @@ namespace LandscapeInstitute.Dynamics.IEntityGenerator
             {
 
                 if (!Directory.Exists(_config.OutputDirectory))
-                {
                     Directory.CreateDirectory(_config.OutputDirectory);
-                }
+
+                if (!Directory.Exists(_config.EntityOutputDir))
+                    Directory.CreateDirectory(_config.EntityOutputDir);
+
+                if (!Directory.Exists(_config.OptionsetOutputDir))
+                    Directory.CreateDirectory(_config.OptionsetOutputDir);
 
                 this.Dispatcher.Invoke(() =>
                 {
@@ -310,7 +334,11 @@ namespace LandscapeInstitute.Dynamics.IEntityGenerator
                         entity.SchemaName,
                         entity.DisplayName,
                         _config.OutputDirectory, 
-                        _config.EntityNamespace
+                        _config.EntityNamespace,
+                        _config.OptionsetNamespace,
+                        _config.UsePartial,
+                        _config.AdditionalUsings,
+                        _config.EntityOutputDir
                     );
 
                     this.Dispatcher.Invoke(() =>
@@ -347,7 +375,7 @@ namespace LandscapeInstitute.Dynamics.IEntityGenerator
                                 {
 
                                     SetStatus($"Generating Optionset for {pickList.OptionSet.DisplayName.LocalizedLabels.FirstOrDefault().Label}...");
-                                    OptionsetWriter optionsetWriter = new OptionsetWriter(entity.LogicalName, entity.DisplayName, pickList.OptionSet.DisplayName.LocalizedLabels.FirstOrDefault().Label, _config.OutputDirectory, _config.OptionsetNamespace);
+                                    OptionsetWriter optionsetWriter = new OptionsetWriter(entity.LogicalName, entity.DisplayName, pickList.OptionSet.DisplayName.LocalizedLabels.FirstOrDefault().Label, _config.OutputDirectory, _config.OptionsetNamespace, _config.OptionsetOutputDir);
 
                                     foreach (OptionMetadata option in pickList.OptionSet.Options)
                                     {
@@ -363,7 +391,7 @@ namespace LandscapeInstitute.Dynamics.IEntityGenerator
                                 if (statusList != null)
                                 {
                                     SetStatus($"Generating Optionset for {statusList.OptionSet.DisplayName.LocalizedLabels.FirstOrDefault().Label}...");
-                                    OptionsetWriter optionsetWriter = new OptionsetWriter(entity.LogicalName, entity.DisplayName, statusList.OptionSet.DisplayName.LocalizedLabels.FirstOrDefault().Label.ToString(), _config.OutputDirectory, _config.OptionsetNamespace);
+                                    OptionsetWriter optionsetWriter = new OptionsetWriter(entity.LogicalName, entity.DisplayName, statusList.OptionSet.DisplayName.LocalizedLabels.FirstOrDefault().Label.ToString(), _config.OutputDirectory, _config.OptionsetNamespace, _config.OptionsetOutputDir);
 
                                     foreach (OptionMetadata option in statusList.OptionSet.Options)
                                     {
@@ -427,6 +455,10 @@ namespace LandscapeInstitute.Dynamics.IEntityGenerator
                 _config.OutputDirectory = OutputDir.Text;
                 _config.EntityNamespace = EntityNamespace.Text;
                 _config.OptionsetNamespace = OptionsetNamespace.Text;
+                _config.UsePartial = UsePartial.IsChecked.GetValueOrDefault(false);
+                _config.AdditionalUsings = AdditionalUsing.Text;
+                _config.EntityOutputDir = EntityOutputDir.Text;
+                _config.OptionsetOutputDir = OptionsetOutputDir.Text;
 
                 if (File.Exists(_configFile)) File.Delete(_configFile);
 
@@ -455,7 +487,11 @@ namespace LandscapeInstitute.Dynamics.IEntityGenerator
             OutputDir.Text = _config.OutputDirectory;
             EntityNamespace.Text = _config.EntityNamespace;
             OptionsetNamespace.Text = _config.OptionsetNamespace;
+            AdditionalUsing.Text = _config.AdditionalUsings;
+            EntityOutputDir.Text = _config.EntityOutputDir;
+            OptionsetOutputDir.Text = _config.OptionsetOutputDir;
 
+            UsePartial.IsChecked = _config.UsePartial;
 
 
         }
@@ -581,6 +617,16 @@ namespace LandscapeInstitute.Dynamics.IEntityGenerator
             SaveConfig();
         }
 
+        private void UsePartials_Checked(object sender, RoutedEventArgs e)
+        {
+            SaveConfig();
+        }
+
+        private void UsePartials_UnChecked(object sender, RoutedEventArgs e)
+        {
+            SaveConfig();
+        }
+
         private void BrowseOutput_Button_Click(object sender, RoutedEventArgs e)
         {
             var dialog = new VistaFolderBrowserDialog();
@@ -615,9 +661,11 @@ namespace LandscapeInstitute.Dynamics.IEntityGenerator
 
         }
 
+
+
+
+
         #endregion
-
-
 
 
     }

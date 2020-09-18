@@ -5,14 +5,14 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:LandscapeInstitute.Dynamics.IEntityGenerator"
         mc:Ignorable="d"
-        Title="Dynamics IEntity Generator" Height="650" Width="1035">
-    <Grid Background="#FFFBFBFB">
+        Title="Dynamics IEntity Generator" Height="650" Width="1183.5">
+    <Grid Background="#FFFBFBFB" Margin="0,0,18,0">
         <Grid.ColumnDefinitions>
             <ColumnDefinition/>
             <ColumnDefinition Width="1200"/>
         </Grid.ColumnDefinitions>
 
-        <TreeView x:Name="TreeView" Grid.ColumnSpan="2" ItemsSource="{Binding CheckBoxList}" HorizontalAlignment="Left" Height="519" Margin="20,7,0,0" VerticalAlignment="Top" Width="483" 
+        <TreeView x:Name="TreeView" Grid.ColumnSpan="2" ItemsSource="{Binding CheckBoxList}" HorizontalAlignment="Left" Height="519" Margin="20,7,0,0" VerticalAlignment="Top" Width="407" 
                   VirtualizingStackPanel.IsVirtualizing="False"
                   VirtualizingStackPanel.VirtualizationMode="Recycling">
             <TreeView.ItemTemplate>
@@ -30,21 +30,21 @@
             </TreeView.ItemContainerStyle>
         </TreeView>
 
-        <TextBox x:Name="Url" Grid.ColumnSpan="2" HorizontalAlignment="Left" Height="23" Margin="542,50,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="342" TextChanged="Validate_TextChanged" BorderBrush="#FFB61111"/>
-        <TextBox x:Name="Username" Grid.ColumnSpan="2" HorizontalAlignment="Left" Height="23" Margin="542,120,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="342" TextChanged="Validate_TextChanged" BorderBrush="#FFB61111"/>
-        <TextBox x:Name="Password" Grid.ColumnSpan="2" HorizontalAlignment="Left" Height="22" Margin="542,190,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="342" TextChanged="Validate_TextChanged" BorderBrush="#FFB61111"/>
-        <Label Grid.ColumnSpan="2" Content="Dynamics URL *" HorizontalAlignment="Left" Margin="537,20,0,0" VerticalAlignment="Top" RenderTransformOrigin="-0.506,0.254" Width="202"/>
-        <Label Grid.ColumnSpan="2" Content="Username *" HorizontalAlignment="Left" Margin="537,90,0,0" VerticalAlignment="Top" RenderTransformOrigin="-0.506,0.254" Width="202"/>
-        <Label Grid.ColumnSpan="2" Content="Password *" HorizontalAlignment="Left" Margin="537,160,0,0" VerticalAlignment="Top" RenderTransformOrigin="-0.506,0.254" Width="202"/>
-        <Button x:Name="Generate_Button" Grid.ColumnSpan="2" Content="Generate C#" HorizontalAlignment="Left" Height="41" Margin="692,485,0,0" VerticalAlignment="Top" Width="136" Click="Generate_Button_Click" Background="#FFE0E0E0" IsEnabled="False"/>
-        <TextBox x:Name="OutputDir" Grid.ColumnSpan="2" HorizontalAlignment="Left" Height="22" Margin="542,260,0,0" VerticalAlignment="Top" Width="351" TextChanged="Validate_TextChanged" BorderBrush="#FFB61111"/>
-        <Label Grid.ColumnSpan="2" Content="Output Directory *" HorizontalAlignment="Left" Margin="537,230,0,0" VerticalAlignment="Top" RenderTransformOrigin="-0.506,0.254" Width="202"/>
-        <Button x:Name="SaveConfig_Button" Grid.ColumnSpan="2" Content="Save" HorizontalAlignment="Left" Height="41" Margin="839,485,0,0" VerticalAlignment="Top" Width="136" Click="SaveConfig_Button_Click" Background="#FFE0E0E0"/>
-        <Button x:Name="BrowseOutput_Button" Grid.ColumnSpan="2" Content="Browse" HorizontalAlignment="Left" Height="22" Margin="887,260,0,0" VerticalAlignment="Top" Width="91" Click="BrowseOutput_Button_Click" FontSize="10" Background="#FFE0E0E0" RenderTransformOrigin="0.912,0.545"/>
-        <TextBox x:Name="EntityNamespace" Grid.ColumnSpan="2" HorizontalAlignment="Left" Height="22" Margin="542,400,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="342" TextChanged="Validate_TextChanged" BorderBrush="#FFB61111"/>
-        <Label Grid.ColumnSpan="2" Content="Entity Namespace *" HorizontalAlignment="Left" Margin="537,370,0,0" VerticalAlignment="Top" RenderTransformOrigin="-0.506,0.254" Width="202"/>
-        <Button x:Name="GetEntities_Button" Grid.ColumnSpan="2" Content="Download Entities" HorizontalAlignment="Left" Height="41" Margin="542,485,0,0" VerticalAlignment="Top" Width="136" Click="GetEntities_Button_Click" Background="#FFE0E0E0" IsEnabled="False"/>
-        <ProgressBar x:Name="ProgressBar" Grid.ColumnSpan="2" HorizontalAlignment="Left" Height="23" Margin="20,572,0,0" VerticalAlignment="Top" Width="978" Background="#FFF1F1F1">
+        <TextBox x:Name="Url" Grid.ColumnSpan="2" HorizontalAlignment="Left" Height="23" Margin="460,50,0,0" VerticalAlignment="Top" Width="289" TextChanged="Validate_TextChanged" BorderBrush="#FFB61111"/>
+        <TextBox x:Name="Username" Grid.ColumnSpan="2" HorizontalAlignment="Left" Height="23" Margin="460,120,0,0" VerticalAlignment="Top" Width="289" TextChanged="Validate_TextChanged" BorderBrush="#FFB61111"/>
+        <TextBox x:Name="Password" Grid.ColumnSpan="2" HorizontalAlignment="Left" Height="22" Margin="460,190,0,0" VerticalAlignment="Top" Width="289" TextChanged="Validate_TextChanged" BorderBrush="#FFB61111"/>
+        <Label Grid.ColumnSpan="2" Content="Dynamics URL *" HorizontalAlignment="Left" Margin="456,20,0,0" VerticalAlignment="Top" RenderTransformOrigin="-0.506,0.254" Width="171"/>
+        <Label Grid.ColumnSpan="2" Content="Username *" HorizontalAlignment="Left" Margin="456,90,0,0" VerticalAlignment="Top" RenderTransformOrigin="-0.506,0.254" Width="171"/>
+        <Label Grid.ColumnSpan="2" Content="Password *" HorizontalAlignment="Left" Margin="456,160,0,0" VerticalAlignment="Top" RenderTransformOrigin="-0.506,0.254" Width="171"/>
+        <Button x:Name="Generate_Button" Grid.ColumnSpan="2" Content="Generate C#" HorizontalAlignment="Left" Height="41" Margin="587,485,0,0" VerticalAlignment="Top" Width="115" Click="Generate_Button_Click" Background="#FFE0E0E0" IsEnabled="False"/>
+        <TextBox x:Name="OutputDir" Grid.ColumnSpan="2" HorizontalAlignment="Left" Height="22" Margin="460,260,0,0" VerticalAlignment="Top" Width="296" TextChanged="Validate_TextChanged" BorderBrush="#FFB61111"/>
+        <Label Grid.ColumnSpan="2" Content="Output Directory *" HorizontalAlignment="Left" Margin="456,230,0,0" VerticalAlignment="Top" RenderTransformOrigin="-0.506,0.254" Width="171"/>
+        <Button x:Name="SaveConfig_Button" Grid.ColumnSpan="2" Content="Save" HorizontalAlignment="Left" Height="41" Margin="711,485,0,0" VerticalAlignment="Top" Width="115" Click="SaveConfig_Button_Click" Background="#FFE0E0E0"/>
+        <Button x:Name="BrowseOutput_Button" Grid.ColumnSpan="2" Content="Browse" HorizontalAlignment="Left" Height="22" Margin="751,260,0,0" VerticalAlignment="Top" Width="77" Click="BrowseOutput_Button_Click" FontSize="10" Background="#FFE0E0E0" RenderTransformOrigin="0.912,0.545"/>
+        <TextBox x:Name="EntityNamespace" Grid.ColumnSpan="2" HorizontalAlignment="Left" Height="22" Margin="460,400,0,0" VerticalAlignment="Top" Width="289" TextChanged="Validate_TextChanged" BorderBrush="#FFB61111"/>
+        <Label Grid.ColumnSpan="2" Content="Entity Namespace *" HorizontalAlignment="Left" Margin="456,370,0,0" VerticalAlignment="Top" RenderTransformOrigin="-0.506,0.254" Width="171"/>
+        <Button x:Name="GetEntities_Button" Grid.ColumnSpan="2" Content="Download Entities" HorizontalAlignment="Left" Height="41" Margin="460,485,0,0" VerticalAlignment="Top" Width="115" Click="GetEntities_Button_Click" Background="#FFE0E0E0" IsEnabled="False"/>
+        <ProgressBar x:Name="ProgressBar" Grid.ColumnSpan="2" HorizontalAlignment="Left" Height="23" Margin="20,572,0,0" VerticalAlignment="Top" Width="825" Background="#FFF1F1F1">
             <ProgressBar.Foreground>
                 <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
                     <GradientStop Color="#FF6B9CD6" Offset="0"/>
@@ -52,9 +52,16 @@
                 </LinearGradientBrush>
             </ProgressBar.Foreground>
         </ProgressBar>
-        <Label x:Name="Status" Grid.ColumnSpan="2" Content="Ready" HorizontalAlignment="Left" Margin="20,541,0,0" VerticalAlignment="Top" Width="978" Background="{x:Null}"/>
-        <TextBox x:Name="OptionsetNamespace" Grid.ColumnSpan="2" HorizontalAlignment="Left" Height="22" Margin="542,330,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="342" TextChanged="Validate_TextChanged" BorderBrush="#FFB61111"/>
-        <Label Grid.ColumnSpan="2" Content="Optionset Namespace *" HorizontalAlignment="Left" Margin="537,300,0,0" VerticalAlignment="Top" RenderTransformOrigin="-0.506,0.254" Width="202"/>
+        <Label x:Name="Status" Grid.ColumnSpan="2" Content="Ready" HorizontalAlignment="Left" Margin="20,541,0,0" VerticalAlignment="Top" Width="825" Background="{x:Null}"/>
+        <TextBox x:Name="OptionsetNamespace" Grid.ColumnSpan="2" HorizontalAlignment="Left" Height="22" Margin="460,330,0,0" VerticalAlignment="Top" Width="289" TextChanged="Validate_TextChanged" BorderBrush="#FFB61111"/>
+        <Label Grid.ColumnSpan="2" Content="Optionset Namespace *" HorizontalAlignment="Left" Margin="456,300,0,0" VerticalAlignment="Top" RenderTransformOrigin="-0.506,0.254" Width="171"/>
+        <CheckBox x:Name="UsePartial" Grid.ColumnSpan="2" Content="Use Partial Classes" HorizontalAlignment="Left" Margin="777,51,0,0" VerticalAlignment="Top" Unchecked="UsePartials_UnChecked" Checked="UsePartials_Checked"/>
+        <TextBox x:Name="AdditionalUsing" Grid.ColumnSpan="2" HorizontalAlignment="Left" Height="92" Margin="781,120,0,0" VerticalAlignment="Top" Width="289" TextChanged="Validate_TextChanged" BorderBrush="#FFB61111" AcceptsReturn="True"/>
+        <Label Grid.ColumnSpan="2" Content="Include Using Statements" HorizontalAlignment="Left" Margin="777,90,0,0" VerticalAlignment="Top" RenderTransformOrigin="-0.506,0.254" Width="171"/>
+        <TextBox x:Name="EntityOutputDir" Grid.ColumnSpan="2" HorizontalAlignment="Left" Height="22" Margin="799,330,0,0" VerticalAlignment="Top" Width="289" TextChanged="Validate_TextChanged" BorderBrush="#FFB61111"/>
+        <Label Grid.ColumnSpan="2" Content="Entity Output Directory Name" HorizontalAlignment="Left" Margin="795,300,0,0" VerticalAlignment="Top" RenderTransformOrigin="-0.506,0.254" Width="171"/>
+        <TextBox x:Name="OptionsetOutputDir" Grid.ColumnSpan="2" HorizontalAlignment="Left" Height="22" Margin="799,400,0,0" VerticalAlignment="Top" Width="289" TextChanged="Validate_TextChanged" BorderBrush="#FFB61111"/>
+        <Label Grid.ColumnSpan="2" Content="Optionset Output Directory Name" HorizontalAlignment="Left" Margin="795,370,0,0" VerticalAlignment="Top" RenderTransformOrigin="-0.506,0.254" Width="289"/>
 
     </Grid>
 </Window>

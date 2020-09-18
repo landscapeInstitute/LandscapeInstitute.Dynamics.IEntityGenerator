@@ -19,19 +19,19 @@ namespace LandscapeInstitute.Dynamics.IEntityGenerator.Classes
 
         public string EntityLogicalName;
         public string EntityDisplayName;
-        public string OptionsetName;
         public string OutputDirectory;
         public string NameSpace;
         public string OutputFile;
         public string EntityPascalCase;
         public string OptionNamePascalCase;
+        public string OutputSubDirectory;
 
         private string Options;
         private string Body;
 
         public string DataType;
 
-        public OptionsetWriter(string entityLogicalName, string entityDisplayName, string optionsetName, string outputDirectory, string classNamespace)
+        public OptionsetWriter(string entityLogicalName, string entityDisplayName, string optionsetName, string outputDirectory, string classNamespace, string OptionsetOutputDir)
         {
             EntityLogicalName = entityLogicalName;
 
@@ -42,7 +42,9 @@ namespace LandscapeInstitute.Dynamics.IEntityGenerator.Classes
             OptionNamePascalCase = info.ToTitleCase(optionsetName.Replace("_","")).Replace(" ", string.Empty);
 
             NameSpace = classNamespace;
-            OutputDirectory = Path.Combine(outputDirectory, "Optionsets");
+            OutputSubDirectory = OptionsetOutputDir;
+
+            OutputDirectory = Path.Combine(outputDirectory, OutputSubDirectory);
 
             DataType = $"{EntityPascalCase}{OptionNamePascalCase}";
 
@@ -78,9 +80,6 @@ namespace LandscapeInstitute.Dynamics.IEntityGenerator.Classes
                 // </auto-generated>
                 //------------------------------------------------------------------------------
 
-                using Felinesoft.Framework.Core;
-                using Felinesoft.Framework.CoreInterfaces;
-                using Felinesoft.Framework.Ecommerce.Models;
                 using System;
 
                 namespace " + NameSpace + @"{

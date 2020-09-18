@@ -20,11 +20,12 @@ namespace LandscapeInstitute.Dynamics.IEntityGenerator
         public String Username { get; set; }
         public String Password { get; set; }
         public String OutputDirectory { get; set; }
-
-
         public String EntityNamespace { get; set; }
-
         public string OptionsetNamespace { get; set; }
+        public string EntityOutputDir { get; set; }
+        public string OptionsetOutputDir { get; set; }
+        public Boolean UsePartial { get; set; }
+        public string AdditionalUsings { get; set; }
 
         public Boolean HasEntity(string EntityLogicalName)
         {
