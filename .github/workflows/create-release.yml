@@ -21,11 +21,6 @@ jobs:
       - name: Name Release
         run:  echo "::set-env name=RELEASENAME::${{ steps.time.outputs.time }}"          
           
-      - name: Install Dotnet
-        uses: actions/setup-dotnet@v1
-        with:
-          dotnet-version: '3.1.x' # SDK Version to use; x will use the latest version of the 3.1 channel
-
       - name: Setup Nuget.exe
         uses: warrenbuckley/Setup-Nuget@v1
         
@@ -36,7 +31,7 @@ jobs:
         uses: microsoft/setup-msbuild@v1.0.1
 
       - name: Name Release
-        run:  msbuild .\LandscapeInstitute.Dynamics.IEntityGenerator.csproj    
+        run:  msbuild .\LandscapeInstitute.Dynamics.IEntityGenerator.csproj  /p:Configuration=Release   
           
   
       - name: Zip Release
