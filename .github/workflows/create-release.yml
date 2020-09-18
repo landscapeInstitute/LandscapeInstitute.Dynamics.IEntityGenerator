@@ -1,0 +1,44 @@
+name: New Release
+
+on: 
+    push:
+
+jobs:
+  build:
+    name: Upload Release
+    runs-on:  windows-latest
+    steps:
+      - name: Checkout Branch
+        uses: actions/checkout@v2
+ 
+      - name: Get Timestamp
+        id: time
+        uses: nanzm/get-time-action@v1.0
+        with:
+          timeZone: 8
+          format: 'YYYYMMDD' 
+          
+      - name: Is a Stable Release
+        run:  echo "::set-env name=RELEASENAME::${{ steps.time.outputs.time }}"          
+          
+      - name: Install Dotnet
+        uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: '3.1.x' # SDK Version to use; x will use the latest version of the 3.1 channel
+
+      - name: Dotnet Build Updater                 
+        run: dotnet build --configuration Release LandscapeInstitute.Dynamics.IEntityGenerator
+          
+  
+      - name: Zip Release
+        run: Compress-Archive -Path "./Bin/Release/*" -DestinationPath "release.zip"
+         
+      - uses: "marvinpinto/action-automatic-releases@latest"
+        with:
+          repo_token: "${{ secrets.GITHUB_TOKEN }}"
+          automatic_release_tag: ${{ env.RELEASENAME }}
+          prerelease: false
+          title: ${{ env.RELEASENAME }}
+          files: |
+            release.zip
+               
